@@ -28,7 +28,7 @@ class _RecorderTestState extends State<RecorderTest> {
               SoundUtils.record();
             },
             onPanCancel: () {
-              SoundUtils.stop();
+              SoundUtils.stop(context);
             },
             child: TextButton(
               onPressed: () {

@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:seeworld_flutter/components/sound_utils.dart';
+import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:seeworld_flutter/screens/reading/reading.dart';
+import 'package:seeworld_flutter/screens/settings/settings.dart';
+import 'package:seeworld_flutter/widgets/my_appbar.dart';
 import '../components/logger_utils.dart';
 import 'common/common.dart';
 import 'recommend/recommend.dart';
@@ -16,12 +21,12 @@ class _HomeState extends State<Home> {
   final PageController _myPage = PageController(initialPage: 0);
   int _currentIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   _change(int index) {
+    if(index != 0) {
+      FlutterTtsUtils.getTts().stop();
+    } else {
+      FlutterTtsUtils.speakProceed();
+    }
     _currentIndex = index;
     _myPage.jumpToPage(index);
     setState(() {});
@@ -30,17 +35,29 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar:MyAppBarUtils.getHomeAppbar(),
       resizeToAvoidBottomInset: false,
       floatingActionButton: SizedBox(
         width: 95,
         height: 95,
         child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () {
+            },
             backgroundColor: Colors.indigoAccent,
-            child: const Icon(
-              Icons.mic,
-              color: Colors.white,
-              size: 50,
+            child: GestureDetector(
+              onTapDown: (detail) {
+                SoundUtils.record();
+                FlutterTtsUtils.getTts().stop();
+              },
+              onTapUp: (detail) {
+                SoundUtils.stop(context);
+              },
+              child: const Icon(
+                Icons.mic,
+                color: Colors.white,
+                size: 50,
+              ),
             )),
       ),
       floatingActionButtonLocation: const CustomFloatingActionButtonLocation(
@@ -83,7 +100,7 @@ class _HomeState extends State<Home> {
           icon = Icons.newspaper;
           break;
         case 2:
-          icon = Icons.book_online;
+          icon = Icons.menu_book_outlined;
           break;
         case 3:
           icon = Icons.person_outline;
@@ -102,9 +119,9 @@ class _HomeState extends State<Home> {
   _list() {
     return [
       const RecommendContainer(),
-      const CommonContainer(),
-      const Text('333'),
-      const Text('444')
+      const CommonScreen(),
+      const ReadingContainer(),
+      const Settings()
     ];
   }
 }

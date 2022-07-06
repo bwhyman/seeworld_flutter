@@ -5,6 +5,7 @@ import '../../provider/global_provider.dart';
 
 class MyChannel extends StatelessWidget {
   static const _titles = {
+    '综合',
     '国内',
     '国际',
     '政治',

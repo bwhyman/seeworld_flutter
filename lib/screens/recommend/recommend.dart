@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:seeworld_flutter/components/sound_utils.dart';
 import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:seeworld_flutter/provider/news.dart';
+import 'package:seeworld_flutter/screens/recommend/recommend_container.dart';
 
-import '../../components/logger_utils.dart';
-import '../../components/tts_answers.dart';
-import '../../data_test.dart';
+import 'package:seeworld_flutter/components/logger_utils.dart';
 
 class RecommendContainer extends StatefulWidget {
   const RecommendContainer({Key? key}) : super(key: key);
@@ -16,104 +18,162 @@ class RecommendContainer extends StatefulWidget {
 
 class _RecommendContainerState extends State<RecommendContainer>
     with AutomaticKeepAliveClientMixin {
-  ScrollController controller = ScrollController();
-  final List<MyItem> _items = [];
+
+  final ScrollController _controller = ScrollController();
   int _firstIndex = 0;
+  int _lastIndex = 0;
+
   @override
   void initState() {
     super.initState();
-
-    Future.delayed(const Duration(seconds: 2), () {
-      _items.add(MyItem('cc', 2));
-      setState(() {});
-    });
-    int tempIndex = -1;
-    controller.addListener(() {
-      // 向下移动
-      // y = (controller.offset / 290).floor();
-      if (_firstIndex == tempIndex) {
-        return;
-      }
-      //Log.d('controller', _firstIndex);
-      FlutterTtsUtils.getTts().speak(_items[_firstIndex].context);
-      tempIndex = _firstIndex;
-    });
+    init();
   }
+
+  @override
+  void dispose() {
+    FlutterTtsUtils.getTts().stop();
+    super.dispose();
+  }
+
+  init() {
+    Future.delayed(Duration.zero, () => _newsModel.loadNews(context).then((value) => {
+      FlutterTtsUtils.speakNews(_newsModel.listNews()[0])
+    }));
+  }
+
+  double _pointY = 0;
+  double _pointX = 0;
+  static const _distY = 150;
+  static const _scrollDuration = 500;
+  static double _containerH = 615;
+  static const double _dividerH = 2;
+  static const _doubleTapTime = 300;
+  static const _distX = 150;
+  bool _ttsPause = false;
+  late NewsModel _newsModel;
+  int _pointerDown = 0;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    //Log.d('_RecommendContainerState', 'build');
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      displacement: 100,
-      strokeWidth: 3,
-      color: Colors.white,
-      backgroundColor: Colors.teal,
-      child: ListView.custom(
-          cacheExtent: 0.0,
-          physics: const AlwaysScrollableScrollPhysics(),
-          controller: controller,
-          padding: const EdgeInsets.all(5),
-          childrenDelegate: CustomChildDelegate(
+    double height = MediaQuery.of(context).size.height;
+    _containerH = height - 24 - 95;
+    _newsModel = Provider.of<NewsModel>(context);
+    return Listener(
+      onPointerDown: (event) {
+        _pointY = event.position.dy;
+        _pointX = event.position.dx;
+        int temp = DateTime.now().millisecondsSinceEpoch;
+        if(temp - _pointerDown <= _doubleTapTime) {
+          if(_ttsPause) {
+            // resume
+            Log.d('_ttsPause', 'resume');
+          } else {
+            FlutterTtsUtils.getTts().stop();
+          }
+          _ttsPause = !_ttsPause;
+        }
+        _pointerDown = temp;
+        return;
+      },
+      onPointerUp: (event) {
+        int index = -1;
+        bool speak = false;
+        // horizontal
+        // right
+        if (event.position.dx > _pointX) {
+          if (event.position.dx - _pointX > _distX) {
+            Log.d('_distX', 'to right');
+            //SoundUtils.playSeek(true);
+            FlutterTtsUtils.speakSeek();
+            return;
+          }
+          // left
+        } else if (event.position.dx < _pointX) {
+          if (_pointX - event.position.dx > _distX) {
+            Log.d('_distX', 'to left');
+            FlutterTtsUtils.speakSeek(forward: false);
+            return;
+          }
+        }
+
+        // vertical
+        if (event.position.dy > _pointY) {
+          if (event.position.dy - _pointY > _distY) {
+            speak = true;
+            index = _firstIndex;
+          } else {
+            speak = false;
+            index = _lastIndex;
+          }
+        } else if (event.position.dy < _pointY) {
+          if (_pointY - event.position.dy > _distY) {
+            speak = true;
+            index = _lastIndex;
+          } else {
+            speak = false;
+            index = _firstIndex;
+          }
+        }
+        if (index == -1) {
+          return;
+        }
+        if(index <= _newsModel.listNews().length - 1) {
+          _newsModel.loadNews(context);
+        }
+
+        _controller
+            .animateTo(index * (_containerH + _dividerH),
+                duration: const Duration(milliseconds: _scrollDuration),
+                curve: Curves.easeInOutCubic)
+            .then((value) => {
+                  if (speak) {
+                      // tts读取
+                      FlutterTtsUtils.speakNews(_newsModel.listNews()[index])
+                    }
+                });
+      },
+      child: Consumer<NewsModel>(
+        builder: (context, newModel, w) {
+          return ListView.custom(
+              controller: _controller,
+              cacheExtent: 0.0,
+              physics: const AlwaysScrollableScrollPhysics(),
+              childrenDelegate: CustomChildDelegate(
                   (builder, index) {
-                return Container(
-                  constraints:
-                  const BoxConstraints(minHeight: 100, maxHeight: 300),
-                  padding: const EdgeInsets.all(15),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _items[index].context,
-                        style: const TextStyle(fontSize: 20),
-                      )
-                    ],
-                  ),
-                );
-              },
-              itemCount: _items.length,
-              scrollBack: (int firstIndex, int lastIndex) {
-                _firstIndex = firstIndex;
-                Log.d('scrollBack', '$firstIndex and $lastIndex');
-              })),
+                    return Column(children: [
+                      SizedBox(
+                          height: _containerH,
+                          child: RecommendNewsContainer(newModel.listNews()[index])),
+                      const Divider(height: _dividerH)
+                    ]);
+                  },
+                  itemCount: newModel.listNews().length,
+                  scrollBack: (int firstIndex, int lastIndex,
+                      leadingScrollOffset, trailingScrollOffset) {
+                    _firstIndex = firstIndex;
+                    _lastIndex = lastIndex;
+                    //Log.d('tag', '$_firstIndex / $_lastIndex');
+                  }));
+        },
+      ),
     );
-  }
-
-
-  Future<void> _onRefresh() {
-    FlutterTtsUtils.getTts().speak(getUpdate('推荐') + getWait());
-    FlutterTtsUtils.getTts().setQueueMode(1);
-    return Future.delayed(const Duration(seconds: 1), () {
-      var l = _items.length;
-      var count = 10;
-      _items.insertAll(
-          0, List<MyItem>.generate(count, (index) => MyItem('cc${l + index}', index)));
-      setState(() {});
-      FlutterTtsUtils.getTts().speak(getCount(count, '推荐'));
-      FlutterTtsUtils.getTts().setQueueMode(0);
-    });
   }
 
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-
-  @override
-  void dispose() {
-    super.dispose();
-    controller.dispose();
-  }
 }
 
 class MyItem {
   String context;
-  int index;
 
-  MyItem(this.context, this.index);
+  MyItem(this.context);
 }
+
 class CustomChildDelegate extends SliverChildBuilderDelegate {
-  Function(int firstIndex, int lastIndex) scrollBack;
+  Function(int firstIndex, int lastIndex, double leadingScrollOffset,
+      double trailingScrollOffset) scrollBack;
 
   CustomChildDelegate(NullableIndexedWidgetBuilder builder,
       {required int itemCount, required this.scrollBack})
@@ -122,9 +182,13 @@ class CustomChildDelegate extends SliverChildBuilderDelegate {
   @override
   double? estimateMaxScrollOffset(int firstIndex, int lastIndex,
       double leadingScrollOffset, double trailingScrollOffset) {
-    scrollBack(firstIndex, lastIndex);
-    //Log.d('scrollBack', 'firstIndex: $firstIndex and lastIndex: $lastIndex');
+    scrollBack(
+        firstIndex, lastIndex, leadingScrollOffset, trailingScrollOffset);
+    //Log.d('scrollBack', 'leadingScrollOffset: $leadingScrollOffset and trailingScrollOffset: $trailingScrollOffset');
     return super.estimateMaxScrollOffset(
         firstIndex, lastIndex, leadingScrollOffset, trailingScrollOffset);
   }
 }
+
+const content = """
+""";

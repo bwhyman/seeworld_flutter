@@ -1,13 +1,22 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
+import 'package:seeworld_flutter/components/robot.dart';
 import 'dart:convert';
 
 import 'package:seeworld_flutter/components/signature.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
+import 'package:seeworld_flutter/components/tts_answers.dart';
+import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:seeworld_flutter/screens/reading/book_favorites.dart';
+import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
+
+import '../screens/reading/camera.dart';
 
 class SoundUtils {
   static const _tag = 'SoundUtils';
@@ -37,52 +46,75 @@ class SoundUtils {
     },
     'data': ''
   };
-
   static void init() async {
     var root = await getTemporaryDirectory();
+    await _player.openPlayer();
     _path = root.path + _fileName;
 
     PermissionStatus status = await Permission.microphone.request();
     if (status != PermissionStatus.granted) {
       throw RecordingPermissionException("Microphone permission not granted");
     }
-    Log.d(_tag, 'sound init');
   }
 
   static void record() async {
-    Log.d(_tag, 'record');
+    Log.d('record()', 'record()');
     await _recorder.openRecorder();
     await _recorder.startRecorder(
         codec: _codec, toFile: _path, sampleRate: 16000, numChannels: 1);
   }
 
-  static void stop() async {
+  static FlutterSoundPlayer getPlayer() {
+    return _player;
+  }
+
+  static void stop(BuildContext context) async {
     String? result = await _recorder.stopRecorder();
     Log.d(_tag, 'stop');
     await _recorder.closeRecorder();
+    send().then((value) {
+      if(value.contains('设置')) {
+        Navigator.of(context).pushNamed(SettingsScreen.name);
+        return;
+      }
+      if(value.contains('同学')) {
+        RobotUtils.send(value.replaceAll('同学', '')).then((value) {
+          FlutterTtsUtils.getTts().speak(value!);
+        });
+        return;
+      }
+      if(value.contains('临时阅读')) {
+        Navigator.of(context).pushNamed(TakePictureScreen.name);
+        return;
+      }
+      if(value.contains('我的阅读')) {
+        Navigator.of(context).pushNamed(BookFavoritiesScreen.name);
+        return;
+      }
+      FlutterTtsUtils.getTts().speak(TtsAnswersUtils.getUnknowns() );
+    });
   }
 
   static void play() async {
-    await _player.openPlayer();
     await _player.startPlayer(
         fromURI: _path, codec: Codec.pcm16, numChannels: 1, sampleRate: 16000);
     Log.d(_tag, 'play');
   }
+
+  static const _ttsPath = '/sdcard/Android/data/com.example.seeworld_flutter/files/current.wav';
+  static int currentPos = 0;
+
   // 提交接口
   static const _postApiurl = '/api/lingxiyun/cloud/iat/send_request/v1';
 
   static Future<String> send() async {
     String signature = Signature.getSignature(_postApiurl, 'POST');
     var url = Uri.parse('https://api-wuxi-1.cmecloud.cn:8443$signature');
-
-    //var root = await getTemporaryDirectory();
-    //var file = File( root.path + '/flutter_sound_temp.wav');
     var file = File(_path);
+    Log.d('file.readAsBytesSync().length', file.readAsBytesSync().length);
     _streamId = DateTime.now().millisecondsSinceEpoch.toString();
     _headers['streamId'] = _streamId;
-    Log.d(_tag, '_streamId: $_streamId');
     var bytes = file.readAsBytesSync();
-
     String fileBase64 = const Base64Encoder().convert(bytes);
     var l = fileBase64.length;
 
@@ -107,10 +139,9 @@ class SoundUtils {
         }
       }
       var jsonParams = jsonEncode(_params);
-      Log.d(_tag, jsonParams);
+
       var response = await http.post(url, headers: _headers, body: jsonParams);
       var respString = utf8.decode(response.bodyBytes);
-      Log.d(_tag, respString);
     }
     var result = await getStr();
     return result;

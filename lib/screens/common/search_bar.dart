@@ -11,18 +11,19 @@ class _SearchBarState extends State<SearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
       ),
       child: Container(
-        margin: EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
+        margin: const EdgeInsets.only(left: 15, right: 15, top: 5, bottom: 5),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Theme.of(context).primaryColor),
           borderRadius: BorderRadius.circular(15)
         ),
-        child: TextField(
-          decoration: InputDecoration(
+        child: const TextField(
 
+          decoration: InputDecoration(
+            hintText: '七一 系列活动精彩纷呈',
             border: InputBorder.none,
               icon: Padding(
                 padding: EdgeInsets.only(left: 10),
