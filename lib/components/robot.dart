@@ -1,7 +1,8 @@
 
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
+import 'package:seeworld_flutter/components/dio_utils.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
 
 class RobotUtils {
@@ -9,10 +10,9 @@ class RobotUtils {
   
   static Future<String?> send(String msg) async {
     msg = Uri.encodeComponent(msg);
-    var response = await http.get(Uri.parse('$_base_url$msg'));
-    var respString = utf8.decode(response.bodyBytes);
-    Map<String, dynamic> json = jsonDecode(respString);
-    Log.d('json', json['content']);
+    Response resp = await DioUtils.getDio().get('$_base_url$msg');
+    Map<String, dynamic> json = jsonDecode(resp.data);
+    Log.d('RobotUtils', json['content']);
     return json['content'];
   }
 }

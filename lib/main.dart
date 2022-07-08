@@ -9,6 +9,7 @@ import 'package:seeworld_flutter/screens/reading/book_favorites.dart';
 import 'package:seeworld_flutter/screens/reading/camera.dart';
 import 'package:seeworld_flutter/screens/reading/charlotte_web.dart';
 import 'package:seeworld_flutter/screens/recommend/news_detail_screen.dart';
+import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 import 'components/sound_utils.dart';
 import 'screens/home.dart';
@@ -55,7 +56,8 @@ class MyApp extends StatelessWidget {
           SettingsScreen.name: (context) => const SettingsScreen(),
           BookFavoritiesScreen.name: (context) => const BookFavoritiesScreen(),
           CharlotteWebScreen.name: (context) => const CharlotteWebScreen(),
-          NewsDetailsScreen.name: (context) => NewsDetailsScreen(),
+          NewsDetailsScreen.name: (context) => const NewsDetailsScreen(),
+          LoginScreen.name: (context) => const LoginScreen(),
         },
       ),
     );

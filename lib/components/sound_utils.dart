@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:http/http.dart' as http;
+import 'package:seeworld_flutter/components/dio_utils.dart';
 import 'package:seeworld_flutter/components/robot.dart';
 import 'dart:convert';
 
@@ -46,6 +47,7 @@ class SoundUtils {
     },
     'data': ''
   };
+
   static void init() async {
     var root = await getTemporaryDirectory();
     await _player.openPlayer();
@@ -73,25 +75,25 @@ class SoundUtils {
     Log.d(_tag, 'stop');
     await _recorder.closeRecorder();
     send().then((value) {
-      if(value.contains('设置')) {
+      if (value.contains('设置')) {
         Navigator.of(context).pushNamed(SettingsScreen.name);
         return;
       }
-      if(value.contains('同学')) {
+      if (value.contains('同学')) {
         RobotUtils.send(value.replaceAll('同学', '')).then((value) {
           FlutterTtsUtils.getTts().speak(value!);
         });
         return;
       }
-      if(value.contains('临时阅读')) {
+      if (value.contains('临时阅读')) {
         Navigator.of(context).pushNamed(TakePictureScreen.name);
         return;
       }
-      if(value.contains('我的阅读')) {
+      if (value.contains('我的阅读')) {
         Navigator.of(context).pushNamed(BookFavoritiesScreen.name);
         return;
       }
-      FlutterTtsUtils.getTts().speak(TtsAnswersUtils.getUnknowns() );
+      FlutterTtsUtils.getTts().speak(TtsAnswersUtils.getUnknowns());
     });
   }
 
@@ -101,7 +103,8 @@ class SoundUtils {
     Log.d(_tag, 'play');
   }
 
-  static const _ttsPath = '/sdcard/Android/data/com.example.seeworld_flutter/files/current.wav';
+  static const _ttsPath =
+      '/sdcard/Android/data/com.example.seeworld_flutter/files/current.wav';
   static int currentPos = 0;
 
   // 提交接口
@@ -109,9 +112,8 @@ class SoundUtils {
 
   static Future<String> send() async {
     String signature = Signature.getSignature(_postApiurl, 'POST');
-    var url = Uri.parse('https://api-wuxi-1.cmecloud.cn:8443$signature');
     var file = File(_path);
-    Log.d('file.readAsBytesSync().length', file.readAsBytesSync().length);
+
     _streamId = DateTime.now().millisecondsSinceEpoch.toString();
     _headers['streamId'] = _streamId;
     var bytes = file.readAsBytesSync();
@@ -139,10 +141,13 @@ class SoundUtils {
         }
       }
       var jsonParams = jsonEncode(_params);
-
-      var response = await http.post(url, headers: _headers, body: jsonParams);
-      var respString = utf8.decode(response.bodyBytes);
+      Response resp = await DioUtils.getDio().post(
+          'https://api-wuxi-1.cmecloud.cn:8443$signature',
+          options: Options(headers: _headers),
+          data: jsonParams);
+      Log.d('Response', resp);
     }
+
     var result = await getStr();
     return result;
   }
@@ -150,25 +155,23 @@ class SoundUtils {
   static final _getHeaders = {
     'streamId': _streamId,
   };
+
   // 查询接口
   static const _getApiurl = '/api/lingxiyun/cloud/iat/query_result/v1';
 
   static Future<String> getStr() async {
     String signature = Signature.getSignature(_getApiurl, 'GET');
-    var url = Uri.parse('https://api-wuxi-1.cmecloud.cn:8443$signature');
     _getHeaders['streamId'] = _streamId;
-    var response = await http.get(url, headers: _getHeaders);
-    var respString = response.body;
-
-    Log.d(_tag, 'respString: $respString');
-    Map<String, dynamic> jsonResponse = jsonDecode(respString);
-    Map<String, dynamic> json2 = jsonResponse['body'];
-    List<dynamic> json3 = json2['frame_results'];
+    Response resp = await DioUtils.getDio().get(
+        'https://api-wuxi-1.cmecloud.cn:8443$signature',
+        options: Options(headers: _headers));
+    List<dynamic> json3 = resp.data['body']['frame_results'];
     var result = '';
     for (var value in json3) {
       result += value['ansStr'];
     }
     Log.d(_tag, 'result: $result');
+
     return result;
   }
 }

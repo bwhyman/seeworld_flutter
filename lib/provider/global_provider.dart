@@ -6,7 +6,7 @@ class GlobalProvider with ChangeNotifier {
 
   ChannelItem _item = ChannelItem('', 0);
 
-  late ValueNotifier<int> _pageIndexNotifier = ValueNotifier(0);
+  ValueNotifier<int> _pageIndexNotifier = ValueNotifier(0);
 
   ChannelItem get item => _item;
   set item(ChannelItem value) {

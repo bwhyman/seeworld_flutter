@@ -1,9 +1,10 @@
-import 'dart:ui';
+
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:seeworld_flutter/components/dialog.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
 import 'package:seeworld_flutter/screens/home.dart';
 
-import '../constants/Theme.dart';
 
 class Onboarding extends StatelessWidget {
   static const String name = '/onboarding';
@@ -12,6 +13,11 @@ class Onboarding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    (Connectivity().checkConnectivity()).then((value) {
+      if(value == ConnectivityResult.none) {
+        MyDialogUtils.showMyDialog(context, '无法连接网络，请确认当前网络状态');
+      }
+    });
     return Scaffold(
         body: Stack(
       children: [

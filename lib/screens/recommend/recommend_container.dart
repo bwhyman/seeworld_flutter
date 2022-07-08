@@ -47,7 +47,7 @@ class _RecommendNewsContainerState extends State<RecommendNewsContainer> {
                 ),
               ),
               Text(
-                widget.news.publishedTime.replaceAll('T', ' '),
+                widget.news.publishedTime.replaceAll('T', ' ').substring(0, 19),
               )
             ],
           ),

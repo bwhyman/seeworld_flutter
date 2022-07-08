@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
 class Settings extends StatelessWidget {
@@ -10,13 +11,18 @@ class Settings extends StatelessWidget {
     return Column(
       children: [
         Column(
-          children: const [
-            Icon(
-              Icons.person_pin,
-              size: 350,
-              color: Colors.indigo,
+          children:  [
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushNamed(LoginScreen.name);
+              },
+              child: const Icon(
+                Icons.person_pin,
+                size: 250,
+                color: Colors.indigo,
+              ),
             ),
-            Text(
+            const Text(
               '未登录',
               style: TextStyle(color: Colors.indigo),
             )

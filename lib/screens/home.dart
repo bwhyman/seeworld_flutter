@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:seeworld_flutter/components/sound_utils.dart';
 import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:seeworld_flutter/provider/news.dart';
 import 'package:seeworld_flutter/screens/reading/reading.dart';
 import 'package:seeworld_flutter/screens/settings/settings.dart';
 import 'package:seeworld_flutter/widgets/my_appbar.dart';
@@ -32,59 +34,73 @@ class _HomeState extends State<Home> {
     setState(() {});
   }
 
+  late NewsModel _newsModel;
+
+  @override
+  void dispose() {
+    _newsModel.cancelTimer();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar:MyAppBarUtils.getHomeAppbar(),
-      resizeToAvoidBottomInset: false,
-      floatingActionButton: SizedBox(
-        width: 95,
-        height: 95,
-        child: FloatingActionButton(
-            onPressed: () {
-            },
-            backgroundColor: Colors.indigoAccent,
-            child: GestureDetector(
-              onTapDown: (detail) {
-                SoundUtils.record();
-                FlutterTtsUtils.getTts().stop();
-              },
-              onTapUp: (detail) {
-                SoundUtils.stop(context);
-              },
-              child: const Icon(
-                Icons.mic,
-                color: Colors.white,
-                size: 50,
-              ),
-            )),
-      ),
-      floatingActionButtonLocation: const CustomFloatingActionButtonLocation(
-          FloatingActionButtonLocation.centerDocked, 0, -10),
-      bottomNavigationBar: BottomAppBar(
-        notchMargin: 12,
-        color: Colors.white,
-        shape: const CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            _initIconButtons()[0],
-            _initIconButtons()[1],
-            const SizedBox(width: 50),
-            _initIconButtons()[2],
-            _initIconButtons()[3],
-          ],
-        ),
-      ),
-      body: SafeArea(
-        child: PageView(
-          physics: const NeverScrollableScrollPhysics(),
-          controller: _myPage,
-          children: _list(),
-        ),
-      ),
+    return Consumer<NewsModel>(
+      builder: (_, newModel, w) {
+        newModel.setTimer(context);
+        _newsModel = newModel;
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar:MyAppBarUtils.getHomeAppbar(),
+          resizeToAvoidBottomInset: false,
+          floatingActionButton: SizedBox(
+            width: 95,
+            height: 95,
+            child: FloatingActionButton(
+                onPressed: () {
+                },
+                backgroundColor: Colors.indigoAccent,
+                child: GestureDetector(
+                  onTapDown: (detail) {
+                    SoundUtils.record();
+                    FlutterTtsUtils.getTts().stop();
+                  },
+                  onTapUp: (detail) {
+                    SoundUtils.stop(context);
+                  },
+                  child: const Icon(
+                    Icons.mic,
+                    color: Colors.white,
+                    size: 50,
+                  ),
+                )),
+          ),
+          floatingActionButtonLocation: const CustomFloatingActionButtonLocation(
+              FloatingActionButtonLocation.centerDocked, 0, -10),
+          bottomNavigationBar: BottomAppBar(
+            notchMargin: 12,
+            color: Colors.white,
+            shape: const CircularNotchedRectangle(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                _initIconButtons()[0],
+                _initIconButtons()[1],
+                const SizedBox(width: 50),
+                _initIconButtons()[2],
+                _initIconButtons()[3],
+              ],
+            ),
+          ),
+          body: SafeArea(
+            child: PageView(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _myPage,
+              children: _list(),
+            ),
+          ),
+        );
+      },
     );
   }
 

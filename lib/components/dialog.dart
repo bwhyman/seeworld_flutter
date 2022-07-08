@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MyDialogUtils {
-  static showLoading(context) {
+  static showMyDialog(context, String msg) {
     showDialog(
       context: context,
       builder: (context) {
@@ -10,12 +10,12 @@ class MyDialogUtils {
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const <Widget>[
-                CircularProgressIndicator(),
-                SizedBox(
+              children: <Widget>[
+                const CircularProgressIndicator(),
+                const SizedBox(
                   height: 10,
                 ),
-                Text('loading'),
+                Text(msg, style: const TextStyle(color: Colors.white, fontSize: 20),),
               ],
             ),
           ),

@@ -47,13 +47,6 @@ class ReadingContainer extends StatelessWidget {
             Icons.chevron_right,
           ),
           onTap: () {
-            News n = News(
-                nid: 100,
-                title: '天下',
-                content: '大海',
-                type: '国内',
-                publishedTime: '2022-06-04T00:22:16');
-            NotificationUtils.showNotification(n, context);
           },
         ),
         const SizedBox(

@@ -29,6 +29,6 @@ class NotificationUtils {
     var details = NotificationDetails(
       android: androidDetails,
     );
-    _fp.show(news.nid, news.title, '', details);
+    _fp.show(1001, news.title, '', details);
   }
 }

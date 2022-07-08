@@ -44,6 +44,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                   });
               }),
             ),
+            const ListTile(
+              leading: Icon(Icons.electrical_services_outlined,color: Colors.blue,),
+              title: Text('清空缓存数据'),
+              subtitle: Text('当前应用占用 24.7MB'),
+            ),
           ],
         ),
       ),
