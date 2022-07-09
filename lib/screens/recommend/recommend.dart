@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/components/sound_utils.dart';
 import 'package:seeworld_flutter/components/tts_utils.dart';
-import 'package:seeworld_flutter/provider/news.dart';
 import 'package:seeworld_flutter/screens/recommend/recommend_container.dart';
-
 import 'package:seeworld_flutter/components/logger_utils.dart';
+
+import '../../provider/news_model.dart';
 
 class RecommendContainer extends StatefulWidget {
   const RecommendContainer({Key? key}) : super(key: key);
@@ -37,7 +36,7 @@ class _RecommendContainerState extends State<RecommendContainer>
 
   init() {
     Future.delayed(Duration.zero, () => _newsModel.loadNews(context).then((value) => {
-      FlutterTtsUtils.speakNews(_newsModel.listNews()[0])
+      FlutterTtsUtils.speakRecommendNews(_newsModel.listNews()[0])
     }));
   }
 
@@ -85,14 +84,14 @@ class _RecommendContainerState extends State<RecommendContainer>
           if (event.position.dx - _pointX > _distX) {
             Log.d('_distX', 'to right');
             //SoundUtils.playSeek(true);
-            FlutterTtsUtils.speakSeek();
+            //FlutterTtsUtils.speakSeek();
             return;
           }
           // left
         } else if (event.position.dx < _pointX) {
           if (_pointX - event.position.dx > _distX) {
             Log.d('_distX', 'to left');
-            FlutterTtsUtils.speakSeek(forward: false);
+            //FlutterTtsUtils.speakSeek(forward: false);
             return;
           }
         }
@@ -129,12 +128,15 @@ class _RecommendContainerState extends State<RecommendContainer>
             .then((value) => {
                   if (speak) {
                       // tts读取
-                      FlutterTtsUtils.speakNews(_newsModel.listNews()[index])
+                      FlutterTtsUtils.speakRecommendNews(_newsModel.listNews()[index])
                     }
                 });
       },
       child: Consumer<NewsModel>(
         builder: (context, newModel, w) {
+          if(newModel.listNews().isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
           return ListView.custom(
               controller: _controller,
               cacheExtent: 0.0,

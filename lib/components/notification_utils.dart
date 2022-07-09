@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:seeworld_flutter/provider/news.dart';
-import 'package:seeworld_flutter/screens/recommend/news_detail_screen.dart';
+import 'package:seeworld_flutter/provider/news_model.dart';
+import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
 
 
 class NotificationUtils {

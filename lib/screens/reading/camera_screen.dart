@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,6 +104,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
   _send() async {
     String result = await OcrUtils.send(widget.imagePath);
+    File(widget.imagePath).deleteSync();
     _msg = result;
     FlutterTtsUtils.getTts().speak(_msg);
     setState(() {});

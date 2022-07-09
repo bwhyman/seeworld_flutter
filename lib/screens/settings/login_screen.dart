@@ -1,7 +1,7 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:seeworld_flutter/components/dialog.dart';
+import 'package:seeworld_flutter/components/dialog_utils.dart';
 import 'package:seeworld_flutter/widgets/my_appbar.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: MyAppBarUtils.getTitleAppbar(context, '登录', isActions: false),
+      appBar: MyAppBarUtils.getTitleAppbar(context, '登录'),
       body: GestureDetector(
         onTap: () {
           _userNameFN.unfocus();
@@ -61,7 +61,7 @@ class LoginScreenState extends State<LoginScreen> {
                     ),
                     TextField(
                       focusNode: _pwdFN,
-                      keyboardType: TextInputType.visiblePassword,
+                      obscureText: true,
                       decoration: InputDecoration(
                           hintText: '请输入密码',
                           prefixIcon: const Icon(Icons.lock),
@@ -83,7 +83,7 @@ class LoginScreenState extends State<LoginScreen> {
                   MyDialogUtils.showMyDialog(context, '');
                   Future.delayed(const Duration(seconds: 4), () {
                     Navigator.pop(context);
-                    MyDialogUtils.showMyDialog(context, '用户名密码错误');
+                    MyDialogUtils.showSimpleDialog(context, '用户名密码错误');
                   });
                 },
                 child: const Text('登录'),

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:seeworld_flutter/components/sound_utils.dart';
 import 'package:seeworld_flutter/components/tts_utils.dart';
-import 'package:seeworld_flutter/provider/news.dart';
-import 'package:seeworld_flutter/screens/reading/reading.dart';
+import 'package:seeworld_flutter/screens/reading/myreading_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings.dart';
 import 'package:seeworld_flutter/widgets/my_appbar.dart';
-import '../components/logger_utils.dart';
-import 'common/common.dart';
+import '../provider/news_model.dart';
+import 'common/common_screen.dart';
 import 'recommend/recommend.dart';
 
 class Home extends StatefulWidget {

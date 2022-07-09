@@ -1,7 +1,7 @@
 
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
-import 'package:seeworld_flutter/components/dialog.dart';
+import 'package:seeworld_flutter/components/dialog_utils.dart';
 import 'package:seeworld_flutter/constants/Theme.dart';
 import 'package:seeworld_flutter/screens/home.dart';
 

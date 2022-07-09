@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:seeworld_flutter/components/notification_utils.dart';
-import 'package:seeworld_flutter/provider/news.dart';
-import 'package:seeworld_flutter/screens/reading/book_favorites.dart';
-import 'package:seeworld_flutter/screens/reading/camera.dart';
-import 'package:seeworld_flutter/components/dialog.dart';
+import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
+import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 
 class ReadingContainer extends StatelessWidget {
   static const name = "/reading";
@@ -22,7 +19,7 @@ class ReadingContainer extends StatelessWidget {
             '我的阅读',
             style: TextStyle(fontSize: 22),
           ),
-          subtitle: const Text('共2本'),
+          //subtitle: const Text('共2本'),
           leading: const Icon(
             Icons.menu_book_outlined,
             color: Colors.blue,
@@ -31,7 +28,7 @@ class ReadingContainer extends StatelessWidget {
             Icons.chevron_right,
           ),
           onTap: () {
-            Navigator.of(context).pushNamed(BookFavoritiesScreen.name);
+            Navigator.of(context).pushNamed(BookListScreen.name);
           },
         ),
         ListTile(

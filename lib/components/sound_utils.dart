@@ -14,10 +14,10 @@ import 'package:seeworld_flutter/components/signature.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
 import 'package:seeworld_flutter/components/tts_answers.dart';
 import 'package:seeworld_flutter/components/tts_utils.dart';
-import 'package:seeworld_flutter/screens/reading/book_favorites.dart';
+import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
-import '../screens/reading/camera.dart';
+import '../screens/reading/camera_screen.dart';
 
 class SoundUtils {
   static const _tag = 'SoundUtils';
@@ -90,7 +90,7 @@ class SoundUtils {
         return;
       }
       if (value.contains('我的阅读')) {
-        Navigator.of(context).pushNamed(BookFavoritiesScreen.name);
+        Navigator.of(context).pushNamed(BookListScreen.name);
         return;
       }
       FlutterTtsUtils.getTts().speak(TtsAnswersUtils.getUnknowns());

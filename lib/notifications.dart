@@ -1,7 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:seeworld_flutter/screens/recommend/news_detail_screen.dart';
+import 'package:seeworld_flutter/components/logger_utils.dart';
+import 'package:seeworld_flutter/components/sqlite_utils.dart';
+import 'package:seeworld_flutter/provider/book_model.dart';
+import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
 
 
 
@@ -30,32 +33,10 @@ class MyHome extends StatefulWidget {
 }
 
 class MyHomeState extends State<MyHome> {
-  final FlutterLocalNotificationsPlugin fp = FlutterLocalNotificationsPlugin();
 
   @override
   void initState() {
     super.initState();
-  }
-
-  show() {
-    var android = const AndroidInitializationSettings("@mipmap/ic_launcher");
-    fp.initialize(InitializationSettings(android: android),
-        onSelectNotification: (payload) {
-          Navigator.of(context).pushNamed(NewsDetailsScreen.name);
-    });
-    var androidDetails = const AndroidNotificationDetails(
-        'id 描述',
-        '名称描述',
-        importance: Importance.max,
-        priority: Priority.high,
-    );
-    var details = NotificationDetails(
-      android: androidDetails,
-    );
-    Future.delayed(const Duration(seconds: 2), () async {
-      await fp.show(1, 'title', '', details);
-    });
-
   }
 
   @override
@@ -65,10 +46,15 @@ class MyHomeState extends State<MyHome> {
       appBar: AppBar(),
       body: TextButton(
         onPressed: () {
-          show();
+          check();
         },
         child: Text('add'),
       ),
     );
   }
+
+  void check() async {
+
+  }
+
 }

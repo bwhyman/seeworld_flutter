@@ -3,12 +3,14 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/provider/global_provider.dart';
-import 'package:seeworld_flutter/provider/news.dart';
-import 'package:seeworld_flutter/screens/reading/book_favorites.dart';
-import 'package:seeworld_flutter/screens/reading/camera.dart';
-import 'package:seeworld_flutter/screens/reading/charlotte_web.dart';
-import 'package:seeworld_flutter/screens/recommend/news_detail_screen.dart';
+import 'package:seeworld_flutter/provider/book_init.dart';
+import 'package:seeworld_flutter/provider/book_model.dart';
+import 'package:seeworld_flutter/provider/channel_model.dart';
+import 'package:seeworld_flutter/provider/news_model.dart';
+import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
+import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
+import 'package:seeworld_flutter/screens/reading/book_screen.dart';
+import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
 import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 import 'components/sound_utils.dart';
@@ -36,14 +38,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BookInit.initBook(context);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<NewsModel>(
         create: (context) => NewsModel(),
         ),
-        ChangeNotifierProvider<GlobalProvider>(
-          create: (context) => GlobalProvider(),
-        )
+        ChangeNotifierProvider<ChannelModel>(
+          create: (context) => ChannelModel(),
+        ),
+        ChangeNotifierProvider<BookModel>(
+          create: (context) => BookModel(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -54,8 +60,8 @@ class MyApp extends StatelessWidget {
           RecorderTest.name: (context) => const RecorderTest(),
           TakePictureScreen.name: (context) => TakePictureScreen(camera: _firstCamera),
           SettingsScreen.name: (context) => const SettingsScreen(),
-          BookFavoritiesScreen.name: (context) => const BookFavoritiesScreen(),
-          CharlotteWebScreen.name: (context) => const CharlotteWebScreen(),
+          BookListScreen.name: (context) => const BookListScreen(),
+          BookScreen.name: (context) => const BookScreen(),
           NewsDetailsScreen.name: (context) => const NewsDetailsScreen(),
           LoginScreen.name: (context) => const LoginScreen(),
         },

@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../provider/global_provider.dart';
+import '../../provider/channel_model.dart';
 
-class MyChannel extends StatelessWidget {
+class ChannelList extends StatelessWidget {
   static const _titles = {
-    '综合',
-    '国内',
-    '国际',
-    '政治',
-    '军事',
+    '时政',
+    '社会',
     '财经',
     '体育',
-    '生活',
-    '教育',
-    '科技',
     '娱乐',
+    '房产',
+    '彩票',
+    '教育',
+    '时尚',
     '游戏',
+    '科技',
+    '股票',
+    '星座',
+    '家居',
   };
 
-  const MyChannel({Key? key}) : super(key: key);
+  const ChannelList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,7 @@ class _ChannelItemWidget extends StatefulWidget {
 class _ChannelItemWidgetState extends State<_ChannelItemWidget> {
   @override
   Widget build(BuildContext context) {
-    final channelItemProvider = Provider.of<GlobalProvider>(context);
+    final channelItemProvider = Provider.of<ChannelModel>(context);
     var item = channelItemProvider.item;
     return GestureDetector(
       onTap: () {
@@ -73,9 +75,4 @@ class _ChannelItemWidgetState extends State<_ChannelItemWidget> {
   }
 }
 
-class ChannelItem {
-  String title;
-  int index;
 
-  ChannelItem(this.title, this.index);
-}

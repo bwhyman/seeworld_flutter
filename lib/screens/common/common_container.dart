@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/provider/news.dart';
-import 'package:seeworld_flutter/screens/recommend/news_detail_screen.dart';
+import 'package:seeworld_flutter/provider/news_model.dart';
+import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
+
+import '../../provider/channel_model.dart';
 
 class CommonContainer extends StatefulWidget {
   const CommonContainer({Key? key}) : super(key: key);
@@ -16,14 +18,17 @@ class CommonContainerState extends State<CommonContainer> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Consumer<NewsModel>(builder: (context, newModel, w) {
+    return Consumer<ChannelModel>(builder: (context, channelModel, w) {
+      List<News> newsList = channelModel.newsList.value;
+      if(newsList.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
       return ListView.builder(
-        itemCount: newModel.listNews().length,
+        itemCount: newsList.length,
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
             onTap: () {
-              newModel.setCurrentNews(newModel.listNews()[index]);
-              Navigator.of(context).pushNamed(NewsDetailsScreen.name);
+              Navigator.of(context).pushNamed(NewsDetailsScreen.name, arguments: newsList[index]);
             },
             child: Card(
               margin: const EdgeInsets.only(top: 8, left: 12, right: 12),
@@ -31,19 +36,19 @@ class CommonContainerState extends State<CommonContainer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    newModel.listNews()[index].title,
+                    newsList[index].title,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Row(
-                    children: [Text(newModel.listNews()[index].type)],
+                    children: [Text(newsList[index].type)],
                   ),
                   Text(
-                    newModel.listNews()[index].content,
+                    newsList[index].content,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   Row(

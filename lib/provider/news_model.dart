@@ -45,8 +45,10 @@ class NewsModel with ChangeNotifier {
     } catch (e) {
       Log.d('tag', e);
     }
-    return false;
+    return true;
   }
+
+
 
   List<News> listNews() {
     return _newsList;

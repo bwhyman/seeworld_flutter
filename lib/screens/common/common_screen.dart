@@ -1,11 +1,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/components/logger_utils.dart';
+import 'package:seeworld_flutter/provider/channel_model.dart';
 import 'package:seeworld_flutter/screens/common/common_container.dart';
 import 'package:seeworld_flutter/screens/common/search_bar.dart';
 
-import '../../provider/global_provider.dart';
 import 'channel_bar.dart';
 
 class CommonScreen extends StatefulWidget {
@@ -20,11 +19,13 @@ class CommonScreenState extends State<CommonScreen> with AutomaticKeepAliveClien
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    ChannelModel ch = Provider.of<ChannelModel>(context, listen: false);
+    ch.loadTypeNews('时政');
     return Column(
       children: const [
         SizedBox(height: 20),
         SearchBar(),
-        Expanded(flex: 0, child: MyChannel()),
+        Expanded(flex: 0, child: ChannelList()),
         Expanded(child: CommonContainer())
       ],
     );
