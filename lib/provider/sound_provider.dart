@@ -1,25 +1,25 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:seeworld_flutter/components/dio_utils.dart';
-import 'package:seeworld_flutter/components/robot.dart';
+import 'package:seeworld_flutter/provider/robot_provider.dart';
 import 'dart:convert';
 
 import 'package:seeworld_flutter/components/signature.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
 import 'package:seeworld_flutter/components/tts_answers.dart';
-import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:seeworld_flutter/provider/tts_provider.dart';
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
+import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
-import '../screens/reading/camera_screen.dart';
 
-class SoundUtils {
+class SoundProvider extends GetConnect {
+  final RobotProvider _robotUtils = Get.put(RobotProvider());
+  final TtsProvider _ttsProvider = Get.put(TtsProvider());
   static const _tag = 'SoundUtils';
 
   // aac; pcm16WAV, wav; pcm16, pcm
@@ -48,7 +48,7 @@ class SoundUtils {
     'data': ''
   };
 
-  static void init() async {
+  void init() async {
     var root = await getTemporaryDirectory();
     await _player.openPlayer();
     _path = root.path + _fileName;
@@ -59,48 +59,45 @@ class SoundUtils {
     }
   }
 
-  static void record() async {
-    Log.d('record()', 'record()');
+  void record() async {
     await _recorder.openRecorder();
     await _recorder.startRecorder(
         codec: _codec, toFile: _path, sampleRate: 16000, numChannels: 1);
   }
 
-  static FlutterSoundPlayer getPlayer() {
+  FlutterSoundPlayer getPlayer() {
     return _player;
   }
 
-  static void stop(BuildContext context) async {
+  void stop() async {
     String? result = await _recorder.stopRecorder();
-    Log.d(_tag, 'stop');
     await _recorder.closeRecorder();
     send().then((value) {
       if (value.contains('设置')) {
-        Navigator.of(context).pushNamed(SettingsScreen.name);
+        Get.toNamed(SettingsScreen.name);
         return;
       }
       if (value.contains('同学')) {
-        RobotUtils.send(value.replaceAll('同学', '')).then((value) {
-          FlutterTtsUtils.getTts().speak(value!);
+        _robotUtils.send(value.replaceAll('同学', '')).then((value) {
+          _ttsProvider.getTts().speak(value!);
         });
         return;
       }
       if (value.contains('临时阅读')) {
-        Navigator.of(context).pushNamed(TakePictureScreen.name);
+        Get.toNamed(TakePictureScreen.name);
         return;
       }
       if (value.contains('我的阅读')) {
-        Navigator.of(context).pushNamed(BookListScreen.name);
+        Get.toNamed(BookListScreen.name);
         return;
       }
-      FlutterTtsUtils.getTts().speak(TtsAnswersUtils.getUnknowns());
+      _ttsProvider.getTts().speak(TtsAnswersUtils.getUnknowns());
     });
   }
 
-  static void play() async {
+  void play() async {
     await _player.startPlayer(
         fromURI: _path, codec: Codec.pcm16, numChannels: 1, sampleRate: 16000);
-    Log.d(_tag, 'play');
   }
 
   static const _ttsPath =
@@ -110,7 +107,7 @@ class SoundUtils {
   // 提交接口
   static const _postApiurl = '/api/lingxiyun/cloud/iat/send_request/v1';
 
-  static Future<String> send() async {
+  Future<String> send() async {
     String signature = Signature.getSignature(_postApiurl, 'POST');
     var file = File(_path);
 
@@ -141,11 +138,11 @@ class SoundUtils {
         }
       }
       var jsonParams = jsonEncode(_params);
-      Response resp = await DioUtils.getDio().post(
-          'https://api-wuxi-1.cmecloud.cn:8443$signature',
-          options: Options(headers: _headers),
-          data: jsonParams);
-      Log.d('Response', resp);
+      Response resp = await post(
+        'https://api-wuxi-1.cmecloud.cn:8443$signature',
+        jsonParams,
+        headers: _headers,
+      );
     }
 
     var result = await getStr();
@@ -159,19 +156,18 @@ class SoundUtils {
   // 查询接口
   static const _getApiurl = '/api/lingxiyun/cloud/iat/query_result/v1';
 
-  static Future<String> getStr() async {
+  Future<String> getStr() async {
     String signature = Signature.getSignature(_getApiurl, 'GET');
     _getHeaders['streamId'] = _streamId;
-    Response resp = await DioUtils.getDio().get(
+    Response resp = await get(
         'https://api-wuxi-1.cmecloud.cn:8443$signature',
-        options: Options(headers: _headers));
-    List<dynamic> json3 = resp.data['body']['frame_results'];
+        headers: _headers);
+    List<dynamic> json3 = resp.body['body']['frame_results'];
     var result = '';
     for (var value in json3) {
       result += value['ansStr'];
     }
     Log.d(_tag, 'result: $result');
-
     return result;
   }
 }

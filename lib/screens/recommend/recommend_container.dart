@@ -1,8 +1,8 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:seeworld_flutter/controller/recommend_controller.dart';
 
-import '../../provider/news_model.dart';
 
 class RecommendNewsContainer extends StatefulWidget {
   final News news;

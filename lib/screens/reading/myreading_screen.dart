@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
 import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 
@@ -28,7 +29,7 @@ class ReadingContainer extends StatelessWidget {
             Icons.chevron_right,
           ),
           onTap: () {
-            Navigator.of(context).pushNamed(BookListScreen.name);
+            Get.toNamed(BookListScreen.name);
           },
         ),
         ListTile(

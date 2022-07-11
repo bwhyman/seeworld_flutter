@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
@@ -14,7 +15,7 @@ class Settings extends StatelessWidget {
           children:  [
             GestureDetector(
               onTap: () {
-                Navigator.of(context).pushNamed(LoginScreen.name);
+                Get.toNamed(LoginScreen.name);
               },
               child: const Icon(
                 Icons.person_pin,
@@ -43,7 +44,7 @@ class Settings extends StatelessWidget {
             Icons.chevron_right,
           ),
           onTap: () {
-            Navigator.of(context).pushNamed(SettingsScreen.name);
+            Get.toNamed(SettingsScreen.name);
           },
         )
       ],

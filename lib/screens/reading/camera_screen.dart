@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:seeworld_flutter/components/image_general_utils.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/provider/dialog_provider.dart';
+import 'package:seeworld_flutter/provider/ocr_provider.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
-import 'package:seeworld_flutter/components/tts_utils.dart';
-import 'package:seeworld_flutter/widgets/my_appbar.dart';
+import 'package:seeworld_flutter/provider/tts_provider.dart';
+import 'package:seeworld_flutter/provider/appbar_provider.dart';
 
 class TakePictureScreen extends StatefulWidget {
   static const name = "/takepicture";
@@ -21,7 +23,6 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-
   @override
   void initState() {
     super.initState();
@@ -42,7 +43,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          toolbarHeight: 0,
+        backgroundColor: Colors.black,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Get.back(),
+          ),
           elevation: 0.0,
           systemOverlayStyle: const SystemUiOverlayStyle(
               statusBarColor: Colors.black,
@@ -61,22 +66,20 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          try {
-            await _initializeControllerFuture;
-            final image = await _controller.takePicture();
-            Log.d('image.path', image.path);
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => DisplayPictureScreen(
-                  imagePath: image.path,
-                ),
-              ),
-            );
-          } catch (e) {}
-        },
-        child: const Icon(Icons.camera_alt_outlined),
+      floatingActionButton: SizedBox(
+        height: 95,
+        width: 95,
+        child: FloatingActionButton(
+          onPressed: () async {
+            try {
+              await _initializeControllerFuture;
+              final image = await _controller.takePicture();
+              await Get.to(DisplayPictureScreen(imagePath: image.path));
+            } catch (e) {}
+          },
+          backgroundColor: Colors.indigoAccent,
+          child: const Icon(Icons.camera_alt_outlined, color: Colors.white,size: 50),
+        ),
       ),
     );
   }
@@ -85,7 +88,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 // A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatefulWidget {
   final String imagePath;
-
   const DisplayPictureScreen({Key? key, required this.imagePath})
       : super(key: key);
 
@@ -94,33 +96,42 @@ class DisplayPictureScreen extends StatefulWidget {
 }
 
 class DisplayPictureScreenState extends State<DisplayPictureScreen> {
+  final DialogProvider _dialogController = Get.put(DialogProvider());
+  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final TtsProvider _ttsProvider = Get.put(TtsProvider());
   String _msg = '';
-
+  final OcrProvider _ocrUtils = Get.put(OcrProvider());
   @override
   void initState() {
     super.initState();
     _send();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      _dialogController.showFullDialog('');
+    });
   }
 
   _send() async {
-    String result = await OcrUtils.send(widget.imagePath);
+    String result = await _ocrUtils.send(widget.imagePath);
     File(widget.imagePath).deleteSync();
     _msg = result;
-    FlutterTtsUtils.getTts().speak(_msg);
+    _ttsProvider.getTts().speak(_msg);
+    Get.back();
     setState(() {});
+    //
   }
 
 
   @override
   void dispose() {
-    FlutterTtsUtils.getTts().stop();
+    _ttsProvider.getTts().stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: MyAppBarUtils.getTitleAppbar(context, '临时阅读'),
+      appBar: _appBarProvider.getTitleAppbar('临时阅读'),
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: Text(
@@ -129,16 +140,5 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
         ),
       ),
     );
-  }
-
-  _selectView(IconData icon, String text) {
-    return PopupMenuItem<String>(
-        child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        Icon(icon, color: Colors.blue),
-        Text(text),
-      ],
-    ));
   }
 }

@@ -1,25 +1,25 @@
 
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:seeworld_flutter/provider/news_model.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/controller/recommend_controller.dart';
 import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
 
 
-class NotificationUtils {
+class NotificationController extends GetxController {
   static final FlutterLocalNotificationsPlugin _fp = _create();
-  static late BuildContext _context;
+  static late News _news;
   static FlutterLocalNotificationsPlugin _create() {
     FlutterLocalNotificationsPlugin fp = FlutterLocalNotificationsPlugin();
     var android = const AndroidInitializationSettings("@mipmap/ic_launcher");
     fp.initialize(InitializationSettings(android: android),
         onSelectNotification: (payload) {
-      Navigator.of(_context).pushNamed(NewsDetailsScreen.name);
+      Get.toNamed(NewsDetailsScreen.name, arguments: _news);
     });
     return fp;
   }
 
-  static void showNotification(News news, BuildContext context) {
-    _context = context;
+  void showNotification(News news) {
+    _news = news;
     var androidDetails = const AndroidNotificationDetails(
       'channelId',
       'channelName',

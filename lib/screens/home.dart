@@ -1,13 +1,18 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/components/sound_utils.dart';
-import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/provider/sound_provider.dart';
+import 'package:seeworld_flutter/provider/tts_provider.dart';
+import 'package:seeworld_flutter/controller/book_controller.dart';
+import 'package:seeworld_flutter/controller/recommend_controller.dart';
 import 'package:seeworld_flutter/screens/reading/myreading_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings.dart';
-import 'package:seeworld_flutter/widgets/my_appbar.dart';
-import '../provider/news_model.dart';
+import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import '../provider/dialog_provider.dart';
 import 'common/common_screen.dart';
-import 'recommend/recommend.dart';
+import 'recommend/recommend_screen.dart';
 
 class Home extends StatefulWidget {
   static const String name = '/home';
@@ -19,87 +24,111 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final SoundProvider _soundUtils = Get.put(SoundProvider());
+  final DialogProvider _dialogUtils = Get.put(DialogProvider());
+  final RecommendController _recommendController =
+      Get.put(RecommendController());
+  final BookController _bookController = Get.put(BookController());
+  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final TtsProvider _ttsProvider = Get.put(TtsProvider());
   final PageController _myPage = PageController(initialPage: 0);
   int _currentIndex = 0;
 
   _change(int index) {
-    if(index != 0) {
-      FlutterTtsUtils.getTts().stop();
+    if (index != 0) {
+      _ttsProvider.getTts().stop();
     } else {
-      FlutterTtsUtils.speakProceed();
+      _ttsProvider.speakProceed();
     }
     _currentIndex = index;
     _myPage.jumpToPage(index);
     setState(() {});
   }
 
-  late NewsModel _newsModel;
+  late StreamSubscription<ConnectivityResult> _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookController.initBook();
+    _soundUtils.init();
+    _checkConnection();
+    _subscription = Connectivity().onConnectivityChanged.listen((event) {
+      if (event == ConnectivityResult.none) {
+        _dialogUtils.showFullDialog('无法连接网络，请确认当前网络状态');
+      }
+    });
+    _recommendController.setTimer();
+  }
+
+  _checkConnection() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      _dialogUtils.showFullDialog('无法连接网络，请确认当前网络状态');
+    }
+  }
 
   @override
   void dispose() {
-    _newsModel.cancelTimer();
+    _myPage.dispose();
+    _recommendController.cancelTimer();
+    _subscription.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NewsModel>(
-      builder: (_, newModel, w) {
-        newModel.setTimer(context);
-        _newsModel = newModel;
-        return Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar:MyAppBarUtils.getHomeAppbar(),
-          resizeToAvoidBottomInset: false,
-          floatingActionButton: SizedBox(
-            width: 95,
-            height: 95,
-            child: FloatingActionButton(
-                onPressed: () {
-                },
-                backgroundColor: Colors.indigoAccent,
-                child: GestureDetector(
-                  onTapDown: (detail) {
-                    SoundUtils.record();
-                    FlutterTtsUtils.getTts().stop();
-                  },
-                  onTapUp: (detail) {
-                    SoundUtils.stop(context);
-                  },
-                  child: const Icon(
-                    Icons.mic,
-                    color: Colors.white,
-                    size: 50,
-                  ),
-                )),
-          ),
-          floatingActionButtonLocation: const CustomFloatingActionButtonLocation(
-              FloatingActionButtonLocation.centerDocked, 0, -10),
-          bottomNavigationBar: BottomAppBar(
-            notchMargin: 12,
-            color: Colors.white,
-            shape: const CircularNotchedRectangle(),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                _initIconButtons()[0],
-                _initIconButtons()[1],
-                const SizedBox(width: 50),
-                _initIconButtons()[2],
-                _initIconButtons()[3],
-              ],
-            ),
-          ),
-          body: SafeArea(
-            child: PageView(
-              physics: const NeverScrollableScrollPhysics(),
-              controller: _myPage,
-              children: _list(),
-            ),
-          ),
-        );
-      },
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: _appBarProvider.getHomeAppbar(),
+      resizeToAvoidBottomInset: false,
+      floatingActionButton: SizedBox(
+        width: 95,
+        height: 95,
+        child: FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: Colors.indigoAccent,
+            child: GestureDetector(
+              onTapDown: (detail) {
+                _soundUtils.record();
+                _ttsProvider.getTts().stop();
+              },
+              onTapUp: (detail) {
+                _soundUtils.stop();
+              },
+              child: const Icon(
+                Icons.mic,
+                color: Colors.white,
+                size: 50,
+              ),
+            )),
+      ),
+      floatingActionButtonLocation:
+      const CustomFloatingActionButtonLocation(
+          FloatingActionButtonLocation.centerDocked, 0, -10),
+      bottomNavigationBar: BottomAppBar(
+        notchMargin: 12,
+        color: Colors.white,
+        shape: const CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            _initIconButtons()[0],
+            _initIconButtons()[1],
+            const SizedBox(width: 50),
+            _initIconButtons()[2],
+            _initIconButtons()[3],
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: PageView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _myPage,
+          children: _list(),
+        ),
+      ),
     );
   }
 

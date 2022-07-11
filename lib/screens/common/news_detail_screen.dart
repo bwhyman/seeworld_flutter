@@ -1,8 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:seeworld_flutter/components/tts_utils.dart';
-import 'package:seeworld_flutter/provider/news_model.dart';
-import 'package:seeworld_flutter/widgets/my_appbar.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/provider/tts_provider.dart';
+import 'package:seeworld_flutter/controller/recommend_controller.dart';
+import 'package:seeworld_flutter/provider/appbar_provider.dart';
 
 class NewsDetailsScreen extends StatefulWidget {
   static const name = '/NewsDetailsScreen';
@@ -13,15 +14,16 @@ class NewsDetailsScreen extends StatefulWidget {
 }
 
 class NewsDetailsScreenState extends State<NewsDetailsScreen> {
-
+  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final TtsProvider _ttsProvider = Get.put(TtsProvider());
   static const _iconSize = 40.0;
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     final news = ModalRoute.of(context)!.settings.arguments as News;
-    FlutterTtsUtils.speakNews(news);
+    _ttsProvider.speakNews(news);
     return Scaffold(
-      appBar: MyAppBarUtils.getTitleAppbar(context, '新闻'),
+      appBar: _appBarProvider.getTitleAppbar('新闻'),
       body: ListView(
         children: [
           Padding(
@@ -100,7 +102,7 @@ class NewsDetailsScreenState extends State<NewsDetailsScreen> {
 
   @override
   void dispose() {
-    FlutterTtsUtils.getTts().stop();
+    _ttsProvider.getTts().stop();
     super.dispose();
   }
 

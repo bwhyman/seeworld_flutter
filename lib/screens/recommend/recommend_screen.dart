@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/components/tts_utils.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/provider/tts_provider.dart';
+import 'package:seeworld_flutter/controller/recommend_controller.dart';
 import 'package:seeworld_flutter/screens/recommend/recommend_container.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
-
-import '../../provider/news_model.dart';
 
 class RecommendContainer extends StatefulWidget {
   const RecommendContainer({Key? key}) : super(key: key);
@@ -17,7 +16,9 @@ class RecommendContainer extends StatefulWidget {
 
 class _RecommendContainerState extends State<RecommendContainer>
     with AutomaticKeepAliveClientMixin {
-
+  final RecommendController _recommendController =
+      Get.put(RecommendController());
+  final TtsProvider _ttsProvider = Get.put(TtsProvider());
   final ScrollController _controller = ScrollController();
   int _firstIndex = 0;
   int _lastIndex = 0;
@@ -28,16 +29,19 @@ class _RecommendContainerState extends State<RecommendContainer>
     init();
   }
 
-  @override
-  void dispose() {
-    FlutterTtsUtils.getTts().stop();
-    super.dispose();
+  init() {
+    Future.delayed(
+        Duration.zero,
+        () => _recommendController.listNews().then((value) {
+          _ttsProvider.speakRecommendNews(
+                  _recommendController.recommendNews[0]);
+            }));
   }
 
-  init() {
-    Future.delayed(Duration.zero, () => _newsModel.loadNews(context).then((value) => {
-      FlutterTtsUtils.speakRecommendNews(_newsModel.listNews()[0])
-    }));
+  @override
+  void dispose() {
+    _ttsProvider.getTts().stop();
+    super.dispose();
   }
 
   double _pointY = 0;
@@ -49,7 +53,6 @@ class _RecommendContainerState extends State<RecommendContainer>
   static const _doubleTapTime = 300;
   static const _distX = 150;
   bool _ttsPause = false;
-  late NewsModel _newsModel;
   int _pointerDown = 0;
 
   @override
@@ -57,18 +60,17 @@ class _RecommendContainerState extends State<RecommendContainer>
     super.build(context);
     double height = MediaQuery.of(context).size.height;
     _containerH = height - 24 - 95;
-    _newsModel = Provider.of<NewsModel>(context);
     return Listener(
       onPointerDown: (event) {
         _pointY = event.position.dy;
         _pointX = event.position.dx;
         int temp = DateTime.now().millisecondsSinceEpoch;
-        if(temp - _pointerDown <= _doubleTapTime) {
-          if(_ttsPause) {
+        if (temp - _pointerDown <= _doubleTapTime) {
+          if (_ttsPause) {
             // resume
             Log.d('_ttsPause', 'resume');
           } else {
-            FlutterTtsUtils.getTts().stop();
+            _ttsProvider.getTts().stop();
           }
           _ttsPause = !_ttsPause;
         }
@@ -117,60 +119,53 @@ class _RecommendContainerState extends State<RecommendContainer>
         if (index == -1) {
           return;
         }
-        if(index <= _newsModel.listNews().length - 1) {
-          _newsModel.loadNews(context);
+        if (index <= _recommendController.recommendNews.length - 1) {
+          _recommendController.listNews();
         }
 
         _controller
             .animateTo(index * (_containerH + _dividerH),
                 duration: const Duration(milliseconds: _scrollDuration),
                 curve: Curves.easeInOutCubic)
-            .then((value) => {
-                  if (speak) {
-                      // tts读取
-                      FlutterTtsUtils.speakRecommendNews(_newsModel.listNews()[index])
-                    }
-                });
-      },
-      child: Consumer<NewsModel>(
-        builder: (context, newModel, w) {
-          if(newModel.listNews().isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+            .then((value) {
+          if (speak) {
+            // tts读取
+            _ttsProvider.speakRecommendNews(
+                _recommendController.recommendNews[index]);
           }
-          return ListView.custom(
-              controller: _controller,
-              cacheExtent: 0.0,
-              physics: const AlwaysScrollableScrollPhysics(),
-              childrenDelegate: CustomChildDelegate(
-                  (builder, index) {
-                    return Column(children: [
-                      SizedBox(
-                          height: _containerH,
-                          child: RecommendNewsContainer(newModel.listNews()[index])),
-                      const Divider(height: _dividerH)
-                    ]);
-                  },
-                  itemCount: newModel.listNews().length,
-                  scrollBack: (int firstIndex, int lastIndex,
-                      leadingScrollOffset, trailingScrollOffset) {
-                    _firstIndex = firstIndex;
-                    _lastIndex = lastIndex;
-                    //Log.d('tag', '$_firstIndex / $_lastIndex');
-                  }));
-        },
-      ),
+        });
+      },
+      child: Obx(() {
+        return _recommendController.recommendNews.isEmpty
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.custom(
+                controller: _controller,
+                cacheExtent: 0.0,
+                physics: const AlwaysScrollableScrollPhysics(),
+                childrenDelegate: CustomChildDelegate(
+                    (builder, index) {
+                      return Column(children: [
+                        SizedBox(
+                            height: _containerH,
+                            child: RecommendNewsContainer(
+                                _recommendController.recommendNews[index])),
+                        const Divider(height: _dividerH)
+                      ]);
+                    },
+                    itemCount: _recommendController.recommendNews.length,
+                    scrollBack: (int firstIndex, int lastIndex,
+                        leadingScrollOffset, trailingScrollOffset) {
+                      _firstIndex = firstIndex;
+                      _lastIndex = lastIndex;
+                      //Log.d('tag', '$_firstIndex / $_lastIndex');
+                    }));
+      }),
     );
   }
 
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-}
-
-class MyItem {
-  String context;
-
-  MyItem(this.context);
 }
 
 class CustomChildDelegate extends SliverChildBuilderDelegate {
@@ -191,6 +186,3 @@ class CustomChildDelegate extends SliverChildBuilderDelegate {
         firstIndex, lastIndex, leadingScrollOffset, trailingScrollOffset);
   }
 }
-
-const content = """
-""";

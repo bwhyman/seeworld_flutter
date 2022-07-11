@@ -1,7 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:seeworld_flutter/provider/channel_model.dart';
 import 'package:seeworld_flutter/screens/common/common_container.dart';
 import 'package:seeworld_flutter/screens/common/search_bar.dart';
 
@@ -19,12 +17,10 @@ class CommonScreenState extends State<CommonScreen> with AutomaticKeepAliveClien
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    ChannelModel ch = Provider.of<ChannelModel>(context, listen: false);
-    ch.loadTypeNews('时政');
     return Column(
-      children: const [
-        SizedBox(height: 20),
-        SearchBar(),
+      children: [
+        const SizedBox(height: 20),
+        const SearchBar(),
         Expanded(flex: 0, child: ChannelList()),
         Expanded(child: CommonContainer())
       ],

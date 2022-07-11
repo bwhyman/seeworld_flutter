@@ -1,10 +1,10 @@
 
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:path/path.dart';
-import 'package:seeworld_flutter/provider/book_model.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SqliteUtils {
+class SqliteProvider extends GetxController {
   static final Future<Database> _db = _create();
 
   static Future<Database> _create() async {
@@ -21,7 +21,7 @@ class SqliteUtils {
     return database;
   }
 
-  static Future<Database> getDatabase() {
+  Future<Database> getDatabase() {
     return _db;
   }
 

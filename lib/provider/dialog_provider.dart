@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class MyDialogUtils {
-  static showMyDialog(context, String msg) {
+class DialogProvider extends GetxController {
+  showFullDialog(String msg) {
     showDialog(
-      context: context,
+      context: Get.context!,
       builder: (context) {
         return Scaffold(
           backgroundColor: Colors.transparent, // 设置透明背影
@@ -27,10 +28,10 @@ class MyDialogUtils {
     );
   }
 
-  static showSimpleDialog(context, String msg) {
+  showSimpleDialog(String msg) {
     showDialog(
       barrierDismissible: true,
-      context: context,
+      context: Get.context!,
       builder: (context) {
         return SimpleDialog(
           title: const Text('警告'),

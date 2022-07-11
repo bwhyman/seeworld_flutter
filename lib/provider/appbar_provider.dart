@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:seeworld_flutter/components/logger_utils.dart';
+import 'package:get/get.dart';
 
-class MyAppBarUtils {
-  static AppBar getHomeAppbar() {
+class AppBarProvider extends GetxController{
+  AppBar getHomeAppbar() {
     return AppBar(
         toolbarHeight: 0,
         elevation: 0.0,
@@ -12,7 +12,7 @@ class MyAppBarUtils {
             statusBarIconBrightness: Brightness.dark));
   }
 
-  static AppBar getTitleAppbar(BuildContext context, String title,
+  AppBar getTitleAppbar(String title,
       {List<PopupMenuItem<String>>? items}) {
     List<Widget> acts = [];
 
@@ -40,7 +40,7 @@ class MyAppBarUtils {
       elevation: 0.0,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.black),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () => Get.back(),
       ),
       backgroundColor: Colors.white70,
       actions: acts,
@@ -50,7 +50,7 @@ class MyAppBarUtils {
     );
   }
 
-  static PopupMenuItem<String> selectPopMenuItem(IconData icon, String text,
+  PopupMenuItem<String> selectPopMenuItem(IconData icon, String text,
       {void Function()? onTaped}) {
     return PopupMenuItem<String>(
         onTap: () {

@@ -29,9 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.2
   flutter_tts: ^3.5.0
-  dio: ^4.0.6
   logger: ^1.1.0
   crypto: ^3.0.1
   path_provider: ^2.0.9
@@ -39,8 +37,9 @@ dependencies:
   flutter_sound: ^9.1.9
   camera: ^0.9.4+20
   flutter_local_notifications: ^9.6.1
-  connectivity: ^3.0.6
+  connectivity_plus: ^2.3.5
   sqflite: ^2.0.2+1
+  get: ^4.6.5
   path: ^1.8.2
   #workmanager: ^0.4.1
   # The following adds the Cupertino Icons font to your application.

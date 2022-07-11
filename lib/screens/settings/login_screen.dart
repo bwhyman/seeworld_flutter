@@ -1,34 +1,33 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:seeworld_flutter/components/dialog_utils.dart';
-import 'package:seeworld_flutter/widgets/my_appbar.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/provider/dialog_provider.dart';
+import 'package:seeworld_flutter/provider/appbar_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const name = '/LoginScreen';
+
   const LoginScreen({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => LoginScreenState();
-
 }
 
 class LoginScreenState extends State<LoginScreen> {
-
   final FocusNode _userNameFN = FocusNode();
   final FocusNode _pwdFN = FocusNode();
-
+  final DialogProvider _dialogUtils = Get.put(DialogProvider());
+  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
 
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: MyAppBarUtils.getTitleAppbar(context, '登录'),
+      appBar: _appBarProvider.getTitleAppbar('登录'),
       body: GestureDetector(
         onTap: () {
           _userNameFN.unfocus();
@@ -51,13 +50,12 @@ class LoginScreenState extends State<LoginScreen> {
                       focusNode: _userNameFN,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        hintText: '请输入手机号',
-                        prefixIcon: const Icon(Icons.person),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.clear),
-                          onPressed: () {},
-                        )
-                      ),
+                          hintText: '请输入手机号',
+                          prefixIcon: const Icon(Icons.person),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {},
+                          )),
                     ),
                     TextField(
                       focusNode: _pwdFN,
@@ -68,8 +66,7 @@ class LoginScreenState extends State<LoginScreen> {
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.clear),
                             onPressed: () {},
-                          )
-                      ),
+                          )),
                     )
                   ],
                 ),
@@ -80,10 +77,10 @@ class LoginScreenState extends State<LoginScreen> {
               height: 45,
               child: ElevatedButton(
                 onPressed: () {
-                  MyDialogUtils.showMyDialog(context, '');
+                  _dialogUtils.showFullDialog('');
                   Future.delayed(const Duration(seconds: 4), () {
                     Navigator.pop(context);
-                    MyDialogUtils.showSimpleDialog(context, '用户名密码错误');
+                    _dialogUtils.showSimpleDialog('用户名密码错误');
                   });
                 },
                 child: const Text('登录'),
@@ -97,8 +94,14 @@ class LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      SizedBox(child: Image.asset('assets/imgs/weixin.png'), height: 60,),
-                      SizedBox(child: Image.asset('assets/imgs/QQ.png'), height: 50,),
+                      SizedBox(
+                        child: Image.asset('assets/imgs/weixin.png'),
+                        height: 60,
+                      ),
+                      SizedBox(
+                        child: Image.asset('assets/imgs/QQ.png'),
+                        height: 50,
+                      ),
                     ],
                   )
                 ],
@@ -119,5 +122,4 @@ class LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
 }

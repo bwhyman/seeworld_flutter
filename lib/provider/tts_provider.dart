@@ -1,8 +1,9 @@
 
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:seeworld_flutter/provider/news_model.dart';
+import 'package:get/get.dart';
+import 'package:seeworld_flutter/controller/recommend_controller.dart';
 
-class FlutterTtsUtils {
+class TtsProvider extends GetxController {
   static final FlutterTts _tts = _create();
 
 
@@ -13,31 +14,31 @@ class FlutterTtsUtils {
     return tts;
   }
 
-  static FlutterTts getTts() {
+  FlutterTts getTts() {
     return _tts;
   }
 
   static String _currentRecommendNews = '';
 
-  static void speakRecommendNews(News news) async {
+  void speakRecommendNews(News news) async {
     _currentRecommendNews = '标题: ${news.title}. 内容: ${news.content}';
     _tts.speak(_currentRecommendNews);
   }
-  static void speakNews(News news) async {
+  void speakNews(News news) async {
     String n = '标题: ${news.title}. 内容: ${news.content}';
     _tts.speak(n);
   }
 
-  static void resume() {
+  void resume() {
     //_tts.speak(_currentNews.substring(_start, _end));
   }
 
 
-  static void speakContent(String content) {
+  void speakContent(String content) {
     _tts.speak(content);
   }
 
-  static void speakProceed() async {
+  void speakProceed() async {
     _tts.speak(_currentRecommendNews);
   }
 }
