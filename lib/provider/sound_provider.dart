@@ -48,6 +48,12 @@ class SoundProvider extends GetConnect {
     'data': ''
   };
 
+
+  @override
+  void onInit() {
+    httpClient.timeout = const Duration(seconds: 12);
+  }
+
   void init() async {
     var root = await getTemporaryDirectory();
     await _player.openPlayer();

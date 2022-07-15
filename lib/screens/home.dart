@@ -5,10 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/provider/sound_provider.dart';
 import 'package:seeworld_flutter/provider/tts_provider.dart';
-import 'package:seeworld_flutter/controller/book_controller.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
 import 'package:seeworld_flutter/screens/reading/myreading_screen.dart';
-import 'package:seeworld_flutter/screens/settings/settings.dart';
+import 'package:seeworld_flutter/screens/settings/my_screen.dart';
 import 'package:seeworld_flutter/provider/appbar_provider.dart';
 import '../provider/dialog_provider.dart';
 import 'common/common_screen.dart';
@@ -28,7 +27,6 @@ class _HomeState extends State<Home> {
   final DialogProvider _dialogUtils = Get.put(DialogProvider());
   final RecommendController _recommendController =
       Get.put(RecommendController());
-  final BookController _bookController = Get.put(BookController());
   final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
   final PageController _myPage = PageController(initialPage: 0);
@@ -50,7 +48,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    _bookController.initBook();
     _soundUtils.init();
     _checkConnection();
     _subscription = Connectivity().onConnectivityChanged.listen((event) {
@@ -104,7 +101,7 @@ class _HomeState extends State<Home> {
             )),
       ),
       floatingActionButtonLocation:
-      const CustomFloatingActionButtonLocation(
+      const _CustomFloatingActionButtonLocation(
           FloatingActionButtonLocation.centerDocked, 0, -10),
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12,
@@ -170,12 +167,12 @@ class _HomeState extends State<Home> {
   }
 }
 
-class CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
+class _CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
   final FloatingActionButtonLocation location;
   final double offsetX;
   final double offsetY;
 
-  const CustomFloatingActionButtonLocation(
+  const _CustomFloatingActionButtonLocation(
       this.location, this.offsetX, this.offsetY);
 
   @override

@@ -1,8 +1,7 @@
-
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
-
 
 class RecommendNewsContainer extends StatefulWidget {
   final News news;
@@ -14,7 +13,6 @@ class RecommendNewsContainer extends StatefulWidget {
 }
 
 class _RecommendNewsContainerState extends State<RecommendNewsContainer> {
-  static const _iconSize = 40.0;
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +36,10 @@ class _RecommendNewsContainerState extends State<RecommendNewsContainer> {
                 padding: const EdgeInsets.only(left: 8, right: 8),
                 decoration: const BoxDecoration(
                     color: Colors.deepOrange,
-                  borderRadius: BorderRadius.all(Radius.circular(8))
-                ),
+                    borderRadius: BorderRadius.all(Radius.circular(8))),
                 child: Text(
                   widget.news.type,
-                  style: const TextStyle(
-                      color: Colors.white,
-                    fontSize: 18
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
               Text(
@@ -58,42 +52,54 @@ class _RecommendNewsContainerState extends State<RecommendNewsContainer> {
           padding: const EdgeInsets.only(top: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              Icon(
-                Icons.thumb_up_alt_outlined,
-                color: Colors.indigo,
-                size: _iconSize,
+            children: [
+              Column(
+                children: [
+                  _getIcon(Icons.thumb_up_alt_outlined),
+                  Text('${_random100()}')
+                ],
               ),
-              Icon(
-                Icons.replay_outlined,
-                color: Colors.indigo,
-                size: _iconSize,
+              Column(
+                children: [
+                  _getIcon(Icons.replay_outlined),
+                  Text('${_random10()}')
+                ],
               ),
-              Icon(
-                Icons.favorite_border,
-                color: Colors.indigo,
-                size: _iconSize,
+              Column(
+                children: [
+                  _getIcon(Icons.favorite_outline),
+                  Text('${_random10()}')
+                ],
               ),
-              Icon(
-                Icons.star_outline_rounded,
-                color: Colors.indigo,
-                size: _iconSize,
-              ),
-
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.only(left: 8, right: 8),
           child: Text(
             widget.news.content,
             maxLines: 12,
             overflow: TextOverflow.ellipsis,
-            style:
-                const TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 20),
           ),
         ),
       ],
     );
+  }
+  Icon _getIcon(IconData iconData) {
+    return Icon(
+      iconData,
+      color: Colors.indigo,
+      size: 32,
+    );
+  }
+
+  final Random r = Random();
+  int _random100() {
+    return r.nextInt(1000);
+  }
+
+  int _random10() {
+    return r.nextInt(100);
   }
 }

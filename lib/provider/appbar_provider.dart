@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/components/logger_utils.dart';
 
-class AppBarProvider extends GetxController{
+class AppBarProvider extends GetxController {
   AppBar getHomeAppbar() {
     return AppBar(
         toolbarHeight: 0,
@@ -12,23 +13,11 @@ class AppBarProvider extends GetxController{
             statusBarIconBrightness: Brightness.dark));
   }
 
-  AppBar getTitleAppbar(String title,
-      {List<PopupMenuItem<String>>? items}) {
-    List<Widget> acts = [];
+  AppBar getTitleAppbar(String title, {List<IconButton>? items}) {
+    List<IconButton> acts = [];
 
-    if(items != null) {
-      acts = [
-        PopupMenuButton<String>(
-          color: Colors.white,
-          icon: const Icon(
-            Icons.more_horiz_outlined,
-            color: Colors.black,
-          ),
-          itemBuilder: (BuildContext context) {
-            return items;
-          },
-        )
-      ];
+    if (items != null) {
+      acts = items;
     }
 
     return AppBar(
@@ -50,7 +39,7 @@ class AppBarProvider extends GetxController{
     );
   }
 
-  PopupMenuItem<String> selectPopMenuItem(IconData icon, String text,
+  /*PopupMenuItem<String> selectPopMenuItem(IconData icon, String text,
       {void Function()? onTaped}) {
     return PopupMenuItem<String>(
         onTap: () {
@@ -63,5 +52,11 @@ class AppBarProvider extends GetxController{
             Text(text),
           ],
         ));
+  }*/
+
+  IconButton getIconButton(IconData iconData, {void Function()? onPressed}) {
+    return IconButton(
+        onPressed: () => Future.delayed(const Duration(), () => onPressed!()),
+        icon: Icon(iconData, color: Colors.blue));
   }
 }

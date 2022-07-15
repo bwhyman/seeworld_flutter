@@ -32,12 +32,13 @@ class _ChannelItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var cItem = _commonController.currentItem;
     return GestureDetector(
       onTap: () {
-        if (_commonController.currentItem.value.index == item.index) {
+        if (cItem.value.index == item.index) {
           return;
         }
-        _commonController.currentItem.value = item;
+        cItem.value = item;
         _commonController.listNews(item.title);
       },
       child: Container(
@@ -46,13 +47,12 @@ class _ChannelItemWidget extends StatelessWidget {
               item.title,
               style: TextStyle(
                   fontSize: 20,
-                  color: _commonController.currentItem.value.index == item.index
+                  color: cItem.value.index == item.index
                       ? Colors.red
                       : Colors.blue,
-                  decoration:
-                      _commonController.currentItem.value.index == item.index
-                          ? TextDecoration.underline
-                          : null),
+                  decoration: cItem.value.index == item.index
+                      ? TextDecoration.underline
+                      : null),
             )),
       ),
     );

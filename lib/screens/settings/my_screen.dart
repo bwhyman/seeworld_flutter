@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/screens/Favorites/favorites_screen.dart';
 import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
@@ -28,6 +29,24 @@ class Settings extends StatelessWidget {
               style: TextStyle(color: Colors.indigo),
             )
           ],
+        ),
+        const Divider(),
+        ListTile(
+          title: const Text(
+            '收藏',
+            style: TextStyle(fontSize: 22),
+          ),
+          leading: const Icon(
+            Icons.favorite_outline,
+            color: Colors.blue,
+          )
+          ,
+          trailing: const Icon(
+            Icons.chevron_right,
+          ),
+          onTap: () {
+            Get.toNamed(FavoritesScreen.name);
+          },
         ),
         const Divider(),
         ListTile(

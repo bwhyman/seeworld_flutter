@@ -60,6 +60,8 @@ class _RecommendContainerState extends State<RecommendContainer>
     super.build(context);
     double height = MediaQuery.of(context).size.height;
     _containerH = height - 24 - 95;
+    var recommendNews = _recommendController.recommendNews;
+
     return Listener(
       onPointerDown: (event) {
         _pointY = event.position.dy;
@@ -69,7 +71,9 @@ class _RecommendContainerState extends State<RecommendContainer>
           if (_ttsPause) {
             // resume
             Log.d('_ttsPause', 'resume');
+
           } else {
+            // pause
             _ttsProvider.getTts().stop();
           }
           _ttsPause = !_ttsPause;
@@ -119,7 +123,7 @@ class _RecommendContainerState extends State<RecommendContainer>
         if (index == -1) {
           return;
         }
-        if (index <= _recommendController.recommendNews.length - 1) {
+        if (index <= recommendNews.length - 1) {
           _recommendController.listNews();
         }
 
@@ -131,28 +135,28 @@ class _RecommendContainerState extends State<RecommendContainer>
           if (speak) {
             // tts读取
             _ttsProvider.speakRecommendNews(
-                _recommendController.recommendNews[index]);
+                recommendNews[index]);
           }
         });
       },
       child: Obx(() {
-        return _recommendController.recommendNews.isEmpty
+        return recommendNews.isEmpty
             ? const Center(child: CircularProgressIndicator())
             : ListView.custom(
                 controller: _controller,
                 cacheExtent: 0.0,
                 physics: const AlwaysScrollableScrollPhysics(),
-                childrenDelegate: CustomChildDelegate(
+                childrenDelegate: _CustomChildDelegate(
                     (builder, index) {
                       return Column(children: [
                         SizedBox(
                             height: _containerH,
                             child: RecommendNewsContainer(
-                                _recommendController.recommendNews[index])),
+                                recommendNews[index])),
                         const Divider(height: _dividerH)
                       ]);
                     },
-                    itemCount: _recommendController.recommendNews.length,
+                    itemCount: recommendNews.length,
                     scrollBack: (int firstIndex, int lastIndex,
                         leadingScrollOffset, trailingScrollOffset) {
                       _firstIndex = firstIndex;
@@ -168,11 +172,11 @@ class _RecommendContainerState extends State<RecommendContainer>
   bool get wantKeepAlive => true;
 }
 
-class CustomChildDelegate extends SliverChildBuilderDelegate {
+class _CustomChildDelegate extends SliverChildBuilderDelegate {
   Function(int firstIndex, int lastIndex, double leadingScrollOffset,
       double trailingScrollOffset) scrollBack;
 
-  CustomChildDelegate(NullableIndexedWidgetBuilder builder,
+  _CustomChildDelegate(NullableIndexedWidgetBuilder builder,
       {required int itemCount, required this.scrollBack})
       : super(builder, childCount: itemCount);
 

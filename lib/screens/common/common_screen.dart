@@ -9,11 +9,11 @@ class CommonScreen extends StatefulWidget {
   const CommonScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => CommonScreenState();
+  State<StatefulWidget> createState() => _CommonScreenState();
 
 }
 
-class CommonScreenState extends State<CommonScreen> with AutomaticKeepAliveClientMixin{
+class _CommonScreenState extends State<CommonScreen> with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context) {
     super.build(context);

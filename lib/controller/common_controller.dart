@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/components/baseurl_utils.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
 
 class ChannelItem {
@@ -9,8 +10,9 @@ class ChannelItem {
 }
 
 class _ChannelProvider extends GetConnect {
+  static const _baseUrl = BaseUrlUtils.baseUrl;
   Future<List<News>> loadTypeNews(String type) async {
-    Response resp = await get('http://36.138.192.150:3000/api/news/$type/5');
+    Response resp = await get('${_baseUrl}news/$type/5');
     List<dynamic> newsJson = resp.body['data']['news'];
     return newsJson.map((e) => News.fromJson(e)).toList();
   }

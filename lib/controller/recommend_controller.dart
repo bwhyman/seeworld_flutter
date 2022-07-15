@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/components/baseurl_utils.dart';
 import 'package:seeworld_flutter/provider/notification_provider.dart';
 
 class News {
@@ -29,15 +30,16 @@ class News {
 }
 
 class _NewsProvider extends GetConnect {
+  static const _baseUrl = BaseUrlUtils.baseUrl;
   
   Future<List<News>> loadNews() async {
-    Response resp = await get('http://36.138.192.150:3000/api/news/3');
+    Response resp = await get('${_baseUrl}news/3');
     List<dynamic> newsList = resp.body['data']['news'];
     return newsList.map((e) => News.fromJson(e)).toList();
   }
 
   Future<News?> getPushNews() async {
-    Response resp = await get('http://36.138.192.150:3001/api/news/push');
+    Response resp = await get('${_baseUrl}news/push');
     if(resp.body['code'] == 400) {
       return Future.value(null);
     }

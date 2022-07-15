@@ -2,11 +2,14 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/screens/Favorites/favorites_screen.dart';
 
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
+import 'package:seeworld_flutter/screens/reading/camera_chapter_screen.dart';
 import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 import 'package:seeworld_flutter/screens/reading/book_screen.dart';
 import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
+import 'package:seeworld_flutter/screens/reading/chapter_screen.dart';
 import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 import 'screens/home.dart';
@@ -38,6 +41,9 @@ class MyApp extends StatelessWidget {
         GetPage(name: BookScreen.name, page: () => const BookScreen()),
         GetPage(name: NewsDetailsScreen.name, page: () => const NewsDetailsScreen()),
         GetPage(name: LoginScreen.name, page: () => const LoginScreen()),
+        GetPage(name: FavoritesScreen.name, page: () => FavoritesScreen()),
+        GetPage(name: ChapterScreen.name, page: () => const ChapterScreen()),
+        GetPage(name: CameraChapterScreen.name, page: () => CameraChapterScreen(camera: _firstCamera)),
       ],
       home: const Onboarding(),
     );

@@ -11,10 +11,10 @@ class BookListScreen extends StatefulWidget {
   const BookListScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => BookListScreenState();
+  State<StatefulWidget> createState() => _BookListScreenState();
 }
 
-class BookListScreenState extends State<BookListScreen> {
+class _BookListScreenState extends State<BookListScreen> {
   final _addBookController = TextEditingController();
   final BookController _bookController = Get.put(BookController());
   final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
@@ -24,8 +24,8 @@ class BookListScreenState extends State<BookListScreen> {
     _bookController.loadBooks();
     return Scaffold(
       appBar: _appBarProvider.getTitleAppbar('我的阅读', items: [
-        _appBarProvider.selectPopMenuItem(Icons.add, '添加', onTaped: addBook),
-        _appBarProvider.selectPopMenuItem(Icons.cast_connected, '扫码'),
+        _appBarProvider.getIconButton(Icons.add,  onPressed: addBook),
+        _appBarProvider.getIconButton(Icons.cast_connected),
       ]),
       body: _BookList(),
     );
@@ -43,7 +43,7 @@ class BookListScreenState extends State<BookListScreen> {
       context: Get.context!,
       builder: (context) {
         return SimpleDialog(
-          title: const Text('添加图书'),
+          title: const Text('添加读物'),
           elevation: 24,
           children: [
             Container(
@@ -87,7 +87,7 @@ class _BookList extends StatefulWidget {
 
 class _BoolListState extends State<_BookList> {
   late Offset _downOffset;
-  late TextEditingController _editBookController;
+  final TextEditingController _editBookController = TextEditingController();
   final BookController _bookController = Get.put(BookController());
 
 
@@ -117,6 +117,7 @@ class _BoolListState extends State<_BookList> {
                   PopupMenuItem<String>(
                       onTap: () {
                         Future.delayed(const Duration(), () {
+                          _editBookController.value = _editBookController.value.copyWith(text: books[index].name);
                           editBookName(books[index]);
                         });
                       },
@@ -156,6 +157,7 @@ class _BoolListState extends State<_BookList> {
                 Icons.chevron_right,
               ),
               onTap: () {
+                Log.d('books[index]', books[index].id);
                 Get.toNamed(BookScreen.name, arguments: books[index]);
               },
             ),
@@ -164,7 +166,6 @@ class _BoolListState extends State<_BookList> {
   }
 
   editBookName(Book book) {
-    _editBookController = TextEditingController(text: book.name);
     showDialog(
       barrierDismissible: true,
       context: context,

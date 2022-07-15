@@ -92,10 +92,10 @@ class DisplayPictureScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => DisplayPictureScreenState();
+  State<StatefulWidget> createState() => _DisplayPictureScreenState();
 }
 
-class DisplayPictureScreenState extends State<DisplayPictureScreen> {
+class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
   final DialogProvider _dialogController = Get.put(DialogProvider());
   final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
@@ -112,8 +112,7 @@ class DisplayPictureScreenState extends State<DisplayPictureScreen> {
 
   _send() async {
     String result = await _ocrUtils.send(widget.imagePath);
-    File(widget.imagePath).deleteSync();
-    _msg = result;
+    _msg = result.isEmpty ? '对不起，请重新尝试' : result;
     _ttsProvider.getTts().speak(_msg);
     Get.back();
     setState(() {});

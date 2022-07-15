@@ -9,10 +9,10 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => LoginScreenState();
+  State<StatefulWidget> createState() => _LoginScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _userNameFN = FocusNode();
   final FocusNode _pwdFN = FocusNode();
   final DialogProvider _dialogUtils = Get.put(DialogProvider());

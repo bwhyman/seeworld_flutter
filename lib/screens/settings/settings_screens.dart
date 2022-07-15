@@ -9,11 +9,11 @@ class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => SettingsScreenState();
+  State<StatefulWidget> createState() => _SettingsScreenState();
 
 }
 
-class SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen> {
   final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
   bool _yidongYun = false;
   @override
