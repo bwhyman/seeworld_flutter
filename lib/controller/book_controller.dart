@@ -147,5 +147,12 @@ class BookController extends GetxController {
     await database.update(Chapter.table_name,
         {'title': chapter.title, 'content': chapter.content},
         where: "id=?", whereArgs: [chapter.id]);
+    await listChaptersByBid(chapter.bid!);
+  }
+
+  void deleteChapter(Chapter chapter) async {
+    Database database = await _sqliteProvider.getDatabase();
+    await database.delete(Chapter.table_name, where: 'id=?', whereArgs: [chapter.id]);
+    await listChaptersByBid(chapter.bid!);
   }
 }

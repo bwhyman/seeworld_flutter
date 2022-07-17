@@ -32,7 +32,6 @@ dependencies:
   flutter_tts: ^3.5.0
   logger: ^1.1.0
   crypto: ^3.0.1
-  path_provider: ^2.0.9
   permission_handler: ^9.2.0
   flutter_sound: ^9.1.9
   camera: ^0.9.4+20

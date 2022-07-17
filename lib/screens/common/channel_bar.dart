@@ -12,12 +12,12 @@ class ChannelList extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: getItems(),
+        children: _getItems(),
       ),
     );
   }
 
-  List<_ChannelItemWidget> getItems() {
+  List<_ChannelItemWidget> _getItems() {
     return List.generate(_commonController.channelItems.length,
         (index) => _ChannelItemWidget(_commonController.channelItems[index]));
   }

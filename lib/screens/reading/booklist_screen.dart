@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
 import 'package:seeworld_flutter/controller/book_controller.dart';
+import 'package:seeworld_flutter/provider/dialog_provider.dart';
 import 'package:seeworld_flutter/screens/reading/book_screen.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 
 class BookListScreen extends StatefulWidget {
   static const name = '/BookListScreen';
@@ -17,15 +18,17 @@ class BookListScreen extends StatefulWidget {
 class _BookListScreenState extends State<BookListScreen> {
   final _addBookController = TextEditingController();
   final BookController _bookController = Get.put(BookController());
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
+  final DialogProvider _dialogProvider = Get.put(DialogProvider());
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     _bookController.loadBooks();
     return Scaffold(
-      appBar: _appBarProvider.getTitleAppbar('我的阅读', items: [
-        _appBarProvider.getIconButton(Icons.add,  onPressed: addBook),
-        _appBarProvider.getIconButton(Icons.cast_connected),
+      appBar: _widgetProvider.getTitleAppbar('我的阅读', items: [
+        _widgetProvider.getIconButton(Icons.add, onPressed: _addBook),
+        _widgetProvider.getIconButton(Icons.cast_connected),
       ]),
       body: _BookList(),
     );
@@ -37,46 +40,15 @@ class _BookListScreenState extends State<BookListScreen> {
     super.dispose();
   }
 
-  addBook() {
-    return showDialog(
-      barrierDismissible: true,
-      context: Get.context!,
-      builder: (context) {
-        return SimpleDialog(
-          title: const Text('添加读物'),
-          elevation: 24,
-          children: [
-            Container(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _addBookController,
-                      decoration: const InputDecoration(hintText: '书名'),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 15),
-                      width: double.infinity,
-                      height: 45,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            var name = _addBookController.value.text.trim();
-                            if (name.isNotEmpty) {
-                              Book b = Book(
-                                  name: name,
-                                  inserttime: DateTime.now().toString());
-                              _bookController.insertBook(b);
-                            }
-                            Navigator.pop(context);
-                          },
-                          child: const Text('保存')),
-                    )
-                  ],
-                ))
-          ],
-        );
-      },
-    );
+  _addBook() {
+    _dialogProvider.addDialog(_addBookController, '添加读物', '书名', () {
+      var name = _addBookController.value.text.trim();
+      if (name.isNotEmpty) {
+        Book b = Book(name: name, inserttime: DateTime.now().toString());
+        _bookController.insertBook(b);
+      }
+      Get.back();
+    });
   }
 }
 
@@ -86,10 +58,10 @@ class _BookList extends StatefulWidget {
 }
 
 class _BoolListState extends State<_BookList> {
-  late Offset _downOffset;
   final TextEditingController _editBookController = TextEditingController();
   final BookController _bookController = Get.put(BookController());
-
+  final DialogProvider _dialogProvider = Get.put(DialogProvider());
+  final WidgetProvider _appBarProvider = Get.put(WidgetProvider());
 
   @override
   Widget build(BuildContext context) {
@@ -98,6 +70,7 @@ class _BoolListState extends State<_BookList> {
     return Obx(() => ListView.builder(
         itemCount: books.length,
         itemBuilder: (c, index) {
+          late Offset _downOffset;
           return GestureDetector(
             onTapDown: (detail) {
               _downOffset = detail.globalPosition;
@@ -114,33 +87,20 @@ class _BoolListState extends State<_BookList> {
                   renderBox.size.height - _downOffset.dy,
                 ),
                 items: <PopupMenuEntry>[
-                  PopupMenuItem<String>(
-                      onTap: () {
-                        Future.delayed(const Duration(), () {
-                          _editBookController.value = _editBookController.value.copyWith(text: books[index].name);
-                          editBookName(books[index]);
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const <Widget>[
-                          Icon(Icons.edit_outlined, color: Colors.blue),
-                          Text('编辑'),
-                        ],
-                      )),
-                  PopupMenuItem<String>(
-                      onTap: () {
-                        Future.delayed(const Duration(), () {
-                          deleteBook(books[index]);
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const <Widget>[
-                          Icon(Icons.delete_outline, color: Colors.blue),
-                          Text('删除'),
-                        ],
-                      )),
+                  _appBarProvider.getPopupMenuItem(Icons.edit_outlined, '编辑',
+                      onTaped: () {
+                    Future.delayed(const Duration(), () {
+                      _editBookController.value = _editBookController.value
+                          .copyWith(text: books[index].name);
+                      _editBookName(books[index]);
+                    });
+                  }),
+                  _appBarProvider.getPopupMenuItem(Icons.delete_outline, '删除',
+                      onTaped: () {
+                    Future.delayed(const Duration(), () {
+                      _deleteBook(books[index]);
+                    });
+                  }),
                 ],
               );
             },
@@ -157,7 +117,6 @@ class _BoolListState extends State<_BookList> {
                 Icons.chevron_right,
               ),
               onTap: () {
-                Log.d('books[index]', books[index].id);
                 Get.toNamed(BookScreen.name, arguments: books[index]);
               },
             ),
@@ -165,88 +124,22 @@ class _BoolListState extends State<_BookList> {
         }));
   }
 
-  editBookName(Book book) {
-    showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (context) {
-        return SimpleDialog(
-          title: const Text('编辑名称'),
-          elevation: 24,
-          children: [
-            Container(
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _editBookController,
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 15),
-                      width: double.infinity,
-                      height: 45,
-                      child: ElevatedButton(
-                          onPressed: () {
-                            var name = _editBookController.value.text.trim();
-                            if (name.isNotEmpty) {
-                              book.name = name;
-                              _bookController.updateBookName(book);
-                            }
-                            Navigator.pop(context);
-                          },
-                          child: const Text('保存')),
-                    )
-                  ],
-                ))
-          ],
-        );
-      },
-    );
+  _editBookName(Book book) {
+    _dialogProvider.editDialog(_editBookController, '编辑', () {
+      var name = _editBookController.value.text.trim();
+      if (name.isNotEmpty) {
+        book.name = name;
+        _bookController.updateBookName(book);
+      }
+      Get.back();
+    });
   }
 
-  deleteBook(Book book) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return SimpleDialog(
-            title: const Text('警告'),
-            elevation: 24,
-            children: [
-              Container(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Column(
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                            text: '确定删除书籍',
-                            style: const TextStyle(color: Colors.black),
-                            children: [
-                              TextSpan(
-                                  text: book.name,
-                                  style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold)),
-                              const TextSpan(
-                                text: '?',
-                              ),
-                            ]),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 15),
-                        width: double.infinity,
-                        height: 45,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              _bookController.deleteBook(book.id!);
-                              Navigator.pop(context);
-                            },
-                            child: const Text('删除')),
-                      )
-                    ],
-                  ))
-            ],
-          );
-        });
+  _deleteBook(Book book) {
+    _dialogProvider.deleteDialog('确定删除书籍', book.name!, () {
+      _bookController.deleteBook(book.id!);
+      Get.back();
+    });
   }
 
   @override

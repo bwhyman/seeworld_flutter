@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/controller/favorites_controller.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 
 class FavoritesScreen extends StatelessWidget {
   static const name = '/FavoritesScreen';
   FavoritesScreen({Key? key}) : super(key: key);
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _appBarProvider = Get.put(WidgetProvider());
   final FavoritesController _favoritesController =
       Get.put(FavoritesController());
 

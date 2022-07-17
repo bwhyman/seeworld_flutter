@@ -34,6 +34,8 @@ provider/controller划分？
 
 输入域获取值及监听  
 
+封装函数传递，传递封装函数的对象  
+
 **Timer**
 
 ```dart
@@ -53,7 +55,7 @@ time.cancel();
 
 **Camera**
 
-必须在执行runApp()函数前与fluuter engine通信，获取camera对象传入视图组件。
+必须在执行runApp()函数前与flutter engine通信，获取camera对象传入视图组件。
 
 ```dart
 WidgetsFlutterBinding.ensureInitialized();
@@ -61,3 +63,27 @@ WidgetsFlutterBinding.ensureInitialized();
   _firstCamera = cameras.first;
 ```
 
+**showModalBottomSheet**  
+内容超过高度时，通过ConstrainedBox控制  
+
+```dart
+// 在build()中获取容器高度
+var maxShowHeight = MediaQuery.of(context).size.height * 0.8;
+showModalBottomSheet(
+        isScrollControlled: true,
+        builder: (_) {
+          return Padding(
+            child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: maxShowHeight),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        children: [Text(str)],
+                      ),
+                    ),
+                  ],
+                )),
+          );
+        })
+```

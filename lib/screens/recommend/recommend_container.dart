@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 
 class RecommendNewsContainer extends StatefulWidget {
   final News news;
@@ -13,23 +15,21 @@ class RecommendNewsContainer extends StatefulWidget {
 }
 
 class _RecommendNewsContainerState extends State<RecommendNewsContainer> {
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
             widget.news.title,
             style: const TextStyle(fontSize: 28),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          child: Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
@@ -47,59 +47,17 @@ class _RecommendNewsContainerState extends State<RecommendNewsContainer> {
               )
             ],
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Column(
-                children: [
-                  _getIcon(Icons.thumb_up_alt_outlined),
-                  Text('${_random100()}')
-                ],
-              ),
-              Column(
-                children: [
-                  _getIcon(Icons.replay_outlined),
-                  Text('${_random10()}')
-                ],
-              ),
-              Column(
-                children: [
-                  _getIcon(Icons.favorite_outline),
-                  Text('${_random10()}')
-                ],
-              ),
-            ],
+          _widgetProvider.getInfoStatus(),
+          Expanded(
+            child: Text(
+              widget.news.content,
+              //maxLines: 12,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8),
-          child: Text(
-            widget.news.content,
-            maxLines: 12,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
-  }
-  Icon _getIcon(IconData iconData) {
-    return Icon(
-      iconData,
-      color: Colors.indigo,
-      size: 32,
-    );
-  }
-
-  final Random r = Random();
-  int _random100() {
-    return r.nextInt(1000);
-  }
-
-  int _random10() {
-    return r.nextInt(100);
   }
 }

@@ -3,9 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/screens/Favorites/favorites_screen.dart';
-
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
-import 'package:seeworld_flutter/screens/reading/camera_chapter_screen.dart';
 import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 import 'package:seeworld_flutter/screens/reading/book_screen.dart';
 import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
@@ -35,7 +33,7 @@ class MyApp extends StatelessWidget {
       defaultTransition: Transition.cupertino,
       getPages: [
         GetPage(name: Home.name, page: () => const Home()),
-        GetPage(name: TakePictureScreen.name, page: () => TakePictureScreen(camera: _firstCamera)),
+        GetPage(name: CameraScreen.name, page: () => CameraScreen(camera: _firstCamera)),
         GetPage(name: SettingsScreen.name, page: () => const SettingsScreen()),
         GetPage(name: BookListScreen.name, page: () => const BookListScreen()),
         GetPage(name: BookScreen.name, page: () => const BookScreen()),
@@ -43,7 +41,6 @@ class MyApp extends StatelessWidget {
         GetPage(name: LoginScreen.name, page: () => const LoginScreen()),
         GetPage(name: FavoritesScreen.name, page: () => FavoritesScreen()),
         GetPage(name: ChapterScreen.name, page: () => const ChapterScreen()),
-        GetPage(name: CameraChapterScreen.name, page: () => CameraChapterScreen(camera: _firstCamera)),
       ],
       home: const Onboarding(),
     );

@@ -90,7 +90,7 @@ class SoundProvider extends GetConnect {
         return;
       }
       if (value.contains('临时阅读')) {
-        Get.toNamed(TakePictureScreen.name);
+        Get.toNamed(CameraScreen.name);
         return;
       }
       if (value.contains('我的阅读')) {

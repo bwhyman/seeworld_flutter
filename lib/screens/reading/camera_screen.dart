@@ -1,26 +1,20 @@
-import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:seeworld_flutter/provider/dialog_provider.dart';
-import 'package:seeworld_flutter/provider/ocr_provider.dart';
-import 'package:seeworld_flutter/components/logger_utils.dart';
-import 'package:seeworld_flutter/provider/tts_provider.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/screens/reading/temporaryreading_screen.dart';
 
-class TakePictureScreen extends StatefulWidget {
-  static const name = "/takepicture";
+class CameraScreen extends StatefulWidget {
+  static const name = "/CameraScreen";
   final CameraDescription camera;
-
-  const TakePictureScreen({Key? key, required this.camera}) : super(key: key);
+  const CameraScreen({Key? key, required this.camera}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => TakePictureScreenState();
+  State<StatefulWidget> createState() => _CameraScreenState();
 }
 
-class TakePictureScreenState extends State<TakePictureScreen> {
+class _CameraScreenState extends State<CameraScreen> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
   @override
@@ -41,6 +35,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isTemp = ModalRoute.of(context)!.settings.arguments as bool;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -74,7 +69,12 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             try {
               await _initializeControllerFuture;
               final image = await _controller.takePicture();
-              await Get.to(DisplayPictureScreen(imagePath: image.path));
+              if(isTemp) {
+                await Get.to(TemporaryReadingScreen(imagePath: image.path));
+              } else {
+                Get.back(result: image.path);
+              }
+
             } catch (e) {}
           },
           backgroundColor: Colors.indigoAccent,
@@ -85,59 +85,3 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   }
 }
 
-// A widget that displays the picture taken by the user.
-class DisplayPictureScreen extends StatefulWidget {
-  final String imagePath;
-  const DisplayPictureScreen({Key? key, required this.imagePath})
-      : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _DisplayPictureScreenState();
-}
-
-class _DisplayPictureScreenState extends State<DisplayPictureScreen> {
-  final DialogProvider _dialogController = Get.put(DialogProvider());
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
-  final TtsProvider _ttsProvider = Get.put(TtsProvider());
-  String _msg = '';
-  final OcrProvider _ocrUtils = Get.put(OcrProvider());
-  @override
-  void initState() {
-    super.initState();
-    _send();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      _dialogController.showFullDialog('');
-    });
-  }
-
-  _send() async {
-    String result = await _ocrUtils.send(widget.imagePath);
-    _msg = result.isEmpty ? '对不起，请重新尝试' : result;
-    _ttsProvider.getTts().speak(_msg);
-    Get.back();
-    setState(() {});
-    //
-  }
-
-
-  @override
-  void dispose() {
-    _ttsProvider.getTts().stop();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: _appBarProvider.getTitleAppbar('临时阅读'),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Text(
-          _msg,
-          style: const TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-}

@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
 import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 
-class ReadingContainer extends StatelessWidget {
-  static const name = "/reading";
+class MyReadingScreen extends StatelessWidget {
+  static const name = "/MyReadingScreen";
 
-  const ReadingContainer({Key? key}) : super(key: key);
+  const MyReadingScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +60,7 @@ class ReadingContainer extends StatelessWidget {
             color: Colors.blue,
           ),
           onTap: () {
-            Navigator.of(context).pushNamed(TakePictureScreen.name);
+            Get.toNamed(CameraScreen.name, arguments: true);
           },
         ),
       ],

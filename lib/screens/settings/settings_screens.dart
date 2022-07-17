@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -14,13 +14,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   bool _yidongYun = false;
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-        appBar:_appBarProvider.getTitleAppbar('设置'),
+        appBar:_widgetProvider.getTitleAppbar('设置'),
       body: Card(
         child: Column(
           children: [

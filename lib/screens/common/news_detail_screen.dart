@@ -1,11 +1,9 @@
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/provider/tts_provider.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 
 class NewsDetailsScreen extends StatefulWidget {
   static const name = '/NewsDetailsScreen';
@@ -16,7 +14,7 @@ class NewsDetailsScreen extends StatefulWidget {
 }
 
 class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
 
   @override
@@ -25,7 +23,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
     final news = ModalRoute.of(context)!.settings.arguments as News;
     _ttsProvider.speakNews(news);
     return Scaffold(
-      appBar: _appBarProvider.getTitleAppbar('新闻'),
+      appBar: _widgetProvider.getTitleAppbar('新闻'),
       body: GestureDetector(
         onDoubleTap: () => _ttsProvider.getTts().stop(),
         child: ListView(
@@ -64,29 +62,7 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    children: [
-                      _getIcon(Icons.thumb_up_alt_outlined),
-                      Text('${_random100()}')
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      _getIcon(Icons.replay_outlined),
-                      Text('${_random10()}')
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      _getIcon(Icons.favorite_outline),
-                      Text('${_random10()}')
-                    ],
-                  ),
-                ],
-              ),
+              child: _widgetProvider.getInfoStatus(),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
@@ -101,23 +77,6 @@ class _NewsDetailsScreenState extends State<NewsDetailsScreen> {
       ),
     );
   }
-  Icon _getIcon(IconData iconData) {
-    return Icon(
-      iconData,
-      color: Colors.indigo,
-      size: 32,
-    );
-  }
-
-  final Random r = Random();
-  int _random100() {
-    return r.nextInt(1000);
-  }
-
-  int _random10() {
-    return r.nextInt(100);
-  }
-
   @override
   void dispose() {
     _ttsProvider.getTts().stop();

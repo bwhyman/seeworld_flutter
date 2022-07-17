@@ -8,7 +8,7 @@ import 'package:seeworld_flutter/provider/tts_provider.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
 import 'package:seeworld_flutter/screens/reading/myreading_screen.dart';
 import 'package:seeworld_flutter/screens/settings/my_screen.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 import '../provider/dialog_provider.dart';
 import 'common/common_screen.dart';
 import 'recommend/recommend_screen.dart';
@@ -27,7 +27,7 @@ class _HomeState extends State<Home> {
   final DialogProvider _dialogUtils = Get.put(DialogProvider());
   final RecommendController _recommendController =
       Get.put(RecommendController());
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
   final PageController _myPage = PageController(initialPage: 0);
   int _currentIndex = 0;
@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _appBarProvider.getHomeAppbar(),
+      appBar: _widgetProvider.getHomeAppbar(),
       resizeToAvoidBottomInset: false,
       floatingActionButton: SizedBox(
         width: 95,
@@ -161,7 +161,7 @@ class _HomeState extends State<Home> {
     return [
       const RecommendContainer(),
       const CommonScreen(),
-      const ReadingContainer(),
+      const MyReadingScreen(),
       const Settings()
     ];
   }

@@ -1,14 +1,13 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
 import 'package:seeworld_flutter/controller/book_controller.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 import 'package:seeworld_flutter/provider/dialog_provider.dart';
 import 'package:seeworld_flutter/provider/ocr_provider.dart';
 import 'package:seeworld_flutter/provider/tts_provider.dart';
-import 'package:seeworld_flutter/screens/reading/camera_chapter_screen.dart';
+import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 
 class ChapterScreen extends StatefulWidget {
   static const name = '/ChapterScreen';
@@ -20,7 +19,7 @@ class ChapterScreen extends StatefulWidget {
 }
 
 class _ChapterScreenState extends State<ChapterScreen> {
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   final DialogProvider _dialogController = Get.put(DialogProvider());
   final BookController _bookController = Get.put(BookController());
   final OcrProvider _ocrProvider = Get.put(OcrProvider());
@@ -41,7 +40,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
     _chapter = ModalRoute.of(context)!.settings.arguments as Chapter;
     _ttsProvider.speakContent(_chapter.content ?? '');
     List<IconButton> items = [
-      _appBarProvider.getIconButton(
+      _widgetProvider.getIconButton(
           !_isEdit ? Icons.edit_note_outlined : Icons.edit_off_outlined,
           onPressed: () {
         _isEdit = !_isEdit;
@@ -52,13 +51,13 @@ class _ChapterScreenState extends State<ChapterScreen> {
     ];
     if (_isEdit) {
       _ttsProvider.getTts().stop();
-      items.add(_appBarProvider.getIconButton(Icons.document_scanner_outlined,
+      items.add(_widgetProvider.getIconButton(Icons.document_scanner_outlined,
           onPressed: _camera));
     }
 
     return Scaffold(
       appBar:
-          _appBarProvider.getTitleAppbar(_chapter.title ?? '', items: items),
+          _widgetProvider.getTitleAppbar(_chapter.title ?? '', items: items),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: !_isEdit
@@ -99,7 +98,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
 
   _camera() async {
     _ttsProvider.getTts().stop();
-    var imagePath = await Get.toNamed(CameraChapterScreen.name);
+    var imagePath = await Get.toNamed(CameraScreen.name, arguments: false);
     _dialogController.showFullDialog('');
     String result = await _ocrProvider.send(imagePath);
     String r = _editingController.value.text + result;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/provider/dialog_provider.dart';
-import 'package:seeworld_flutter/provider/appbar_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   static const name = '/LoginScreen';
@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _userNameFN = FocusNode();
   final FocusNode _pwdFN = FocusNode();
   final DialogProvider _dialogUtils = Get.put(DialogProvider());
-  final AppBarProvider _appBarProvider = Get.put(AppBarProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: _appBarProvider.getTitleAppbar('登录'),
+      appBar: _widgetProvider.getTitleAppbar('登录'),
       body: GestureDetector(
         onTap: () {
           _userNameFN.unfocus();
