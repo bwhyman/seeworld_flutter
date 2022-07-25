@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
 import 'package:seeworld_flutter/provider/dialog_provider.dart';
 import 'package:seeworld_flutter/provider/ocr_provider.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
@@ -20,7 +21,7 @@ class _TemporaryReadingScreenState extends State<TemporaryReadingScreen> {
   final DialogProvider _dialogController = Get.put(DialogProvider());
   final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
-  String _msg = '';
+  final _msg = ''.obs;
   final OcrProvider _ocrUtils = Get.put(OcrProvider());
   @override
   void initState() {
@@ -33,11 +34,9 @@ class _TemporaryReadingScreenState extends State<TemporaryReadingScreen> {
 
   _send() async {
     String result = await _ocrUtils.send(widget.imagePath);
-    _msg = result.isEmpty ? '对不起，请重新尝试' : result;
-    _ttsProvider.getTts().speak(_msg);
+    _msg.value = result.isEmpty ? '对不起，请重新尝试' : result;
+    _ttsProvider.speakContent(_msg.value);
     Get.back();
-    setState(() {});
-    //
   }
 
 
@@ -54,10 +53,10 @@ class _TemporaryReadingScreenState extends State<TemporaryReadingScreen> {
       appBar: _widgetProvider.getTitleAppbar('临时阅读'),
       body: Padding(
         padding: const EdgeInsets.all(8),
-        child: Text(
-          _msg,
-          style: const TextStyle(fontSize: 20),
-        ),
+        child: Obx(() => Text(
+          _msg.value,
+          style: const TextStyle(fontSize: UI.newsContentFontSize),
+        )),
       ),
     );
   }

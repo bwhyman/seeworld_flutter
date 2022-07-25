@@ -162,4 +162,69 @@ class DialogProvider extends GetxController {
       },
     );
   }
+
+  addComment(TextEditingController controller, String title, Function onPressed) {
+    showDialog(
+      barrierDismissible: true,
+      context: Get.context!,
+      builder: (_) {
+        return SimpleDialog(
+          title: Text(title),
+          elevation: 24,
+          children: [
+            Container(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: controller,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 15),
+                      width: double.infinity,
+                      height: 45,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            onPressed();
+                          },
+                          child: const Text('提交')),
+                    )
+                  ],
+                ))
+          ],
+        );
+      },
+    );
+  }
+  showTutorialDialog(bool checked) {
+    showDialog(
+      context: Get.context!,
+      builder: (_) {
+        return Scaffold(
+          backgroundColor: Colors.transparent, // 设置透明背影
+          body: Container(
+            margin: EdgeInsets.only(top: 30),
+            padding: EdgeInsets.all(8.0),
+            height: 500,
+            width: double.infinity,
+            child: Card(
+              child: Column(
+                children: [
+                  Text('教程'),
+                  CheckboxListTile(
+                    title: Text('不再提示'),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      value: checked,
+                      onChanged: (_) {
+                        checked != checked;
+                      }
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

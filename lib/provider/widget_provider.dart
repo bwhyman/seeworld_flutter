@@ -1,11 +1,14 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
+import 'package:seeworld_flutter/provider/color_provider.dart';
+import 'package:seeworld_flutter/provider/entity.dart';
 
 class WidgetProvider extends GetxController {
+  final ColorProvider _colorProvider = Get.put(ColorProvider());
   AppBar getHomeAppbar() {
     return AppBar(
         toolbarHeight: 0,
@@ -15,7 +18,7 @@ class WidgetProvider extends GetxController {
             statusBarIconBrightness: Brightness.dark));
   }
 
-  AppBar getTitleAppbar(String title, {List<IconButton> items = const []}) {
+  AppBar getTitleAppbar(String title, {List<Widget> items = const []}) {
     return AppBar(
       title: Text(
         title,
@@ -45,56 +48,53 @@ class WidgetProvider extends GetxController {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Icon(icon, color: Colors.blue),
+            Icon(icon, color: _colorProvider.getIconColor()),
             Text(text),
           ],
         ));
   }
 
-  IconButton getIconButton(IconData iconData, {void Function()? onPressed}) {
+  Widget getIconButton(IconData iconData, {void Function()? onPressed}) {
     return IconButton(
         onPressed: () => Future.delayed(const Duration(), () => onPressed!()),
-        icon: Icon(iconData, color: Colors.blue));
+        icon: Icon(iconData, color: _colorProvider.getIconColor()));
   }
 
-  Widget getInfoStatus() {
-    return Row(
+  Widget getInfoStatus(News news, {void Function()? onCommented}) {
+    return Obx(() => Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Column(
           children: [
             _getIcon(Icons.thumb_up_alt_outlined),
-            Text('${_random100()}')
+            Text('${news.likes}')
           ],
         ),
-        Column(
-          children: [
-            _getIcon(Icons.replay_outlined),
-            Text('${_random10()}')
-          ],
+        GestureDetector(
+          onTap: () {
+            onCommented!();
+          },
+          child: Column(
+            children: [
+              _getIcon(Icons.comment_outlined),
+              Text('${news.comments}')
+            ],
+          ),
         ),
         Column(
           children: [
             _getIcon(Icons.favorite_outline),
-            Text('${_random10()}')
+            Text('${news.favorite}')
           ],
         ),
       ],
-    );
+    ));
   }
   Icon _getIcon(IconData iconData) {
     return Icon(
       iconData,
-      color: Colors.indigo,
+      color: _colorProvider.getIconColor(),
       size: 32,
     );
-  }
-  final Random _r = Random();
-  int _random100() {
-    return _r.nextInt(1000);
-  }
-
-  int _random10() {
-    return _r.nextInt(100);
   }
 }

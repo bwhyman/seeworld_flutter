@@ -2,6 +2,7 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
+import 'package:seeworld_flutter/provider/entity.dart';
 import 'package:seeworld_flutter/screens/common/news_detail_screen.dart';
 
 

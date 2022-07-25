@@ -2,32 +2,8 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/components/baseurl_utils.dart';
+import 'package:seeworld_flutter/provider/entity.dart';
 import 'package:seeworld_flutter/provider/notification_provider.dart';
-
-class News {
-  int nid;
-  String title;
-  String content;
-  String type;
-  String publishedTime;
-
-  News(
-      {this.nid = 0,
-        this.title = '',
-        this.content = '',
-        this.type = '',
-        this.publishedTime = ''});
-
-  factory News.fromJson(Map<String, dynamic> json) {
-    return News(
-      nid: json['nid'] ?? 0,
-      title: json['title'],
-      content: json['content'].toString().replaceAll('\\n', '.'),
-      type: json['type'],
-      publishedTime: json['publishedTime'],
-    );
-  }
-}
 
 class _NewsProvider extends GetConnect {
   static const _baseUrl = BaseUrlUtils.baseUrl;
@@ -49,6 +25,7 @@ class _NewsProvider extends GetConnect {
 
 class RecommendController extends GetxController {
   var recommendNews = <News>[].obs;
+  var currentNews = News(content: '', type: '').obs;
   final _newsProvider = Get.put(_NewsProvider());
   final _notificationController = Get.put(NotificationController());
   late Timer _timer;

@@ -1,6 +1,17 @@
 import 'dart:ui' show Color;
 
-class NowUIColors {
+import 'package:flutter/material.dart';
+
+class UI {
+  static const double iconleadingSize = 30;
+  static const double functionFontSize = 18;
+  static const double newsTitleFontSize = 22;
+  static const double newsContentFontSize = 18;
+  static const double newsTypeFontSize = 18;
+  static const Color iconColor = Color.fromRGBO(44, 168, 255, 1.0);
+  static const Color iconIsRGBlinding = Color.fromRGBO(249, 99, 50, 1.0);
+  static const Color newTypeColor = Color.fromRGBO(44, 168, 255, 1.0);
+
   static const Color black = Color(0xFF000000);
 
   static const Color white = Color(0xFFFFFFFF);

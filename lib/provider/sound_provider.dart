@@ -5,12 +5,12 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:seeworld_flutter/provider/robot_provider.dart';
 import 'dart:convert';
 
 import 'package:seeworld_flutter/components/signature.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
 import 'package:seeworld_flutter/components/tts_answers.dart';
+import 'package:seeworld_flutter/provider/robot_provider.dart';
 import 'package:seeworld_flutter/provider/tts_provider.dart';
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
 import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
@@ -18,15 +18,15 @@ import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
 
 class SoundProvider extends GetConnect {
-  final RobotProvider _robotUtils = Get.put(RobotProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
+  final RobotProvider _robotProvider = Get.put(RobotProvider());
   static const _tag = 'SoundUtils';
 
   // aac; pcm16WAV, wav; pcm16, pcm
   static const Codec _codec = Codec.pcm16;
   static const _fileName = '/temp.pcm';
   static final _recorder = FlutterSoundRecorder();
-  static final _player = FlutterSoundPlayer();
+  // static final _player = FlutterSoundPlayer();
   static String _path = '';
   static const _byteLength = 102400;
   static var _streamId = '';
@@ -56,7 +56,7 @@ class SoundProvider extends GetConnect {
 
   void init() async {
     var root = await getTemporaryDirectory();
-    await _player.openPlayer();
+    //await _player.openPlayer();
     _path = root.path + _fileName;
 
     PermissionStatus status = await Permission.microphone.request();
@@ -71,40 +71,49 @@ class SoundProvider extends GetConnect {
         codec: _codec, toFile: _path, sampleRate: 16000, numChannels: 1);
   }
 
-  FlutterSoundPlayer getPlayer() {
+  /*FlutterSoundPlayer getPlayer() {
     return _player;
-  }
+  }*/
 
-  void stop() async {
-    String? result = await _recorder.stopRecorder();
+  Future<String?> stop() async {
+    await _recorder.stopRecorder();
     await _recorder.closeRecorder();
-    send().then((value) {
-      if (value.contains('设置')) {
-        Get.toNamed(SettingsScreen.name);
-        return;
-      }
-      if (value.contains('同学')) {
-        _robotUtils.send(value.replaceAll('同学', '')).then((value) {
-          _ttsProvider.getTts().speak(value!);
-        });
-        return;
-      }
-      if (value.contains('临时阅读')) {
-        Get.toNamed(CameraScreen.name);
-        return;
-      }
-      if (value.contains('我的阅读')) {
-        Get.toNamed(BookListScreen.name);
-        return;
-      }
+    String recordText = await send();
+    if(recordText.isEmpty) {
       _ttsProvider.getTts().speak(TtsAnswersUtils.getUnknowns());
-    });
+      return null;
+    }
+    if (recordText.contains('设置')) {
+      Get.toNamed(SettingsScreen.name);
+      return null;
+    }
+    if (recordText.contains('同学')) {
+      _robotProvider.send(recordText.replaceAll('同学', '')).then((value) {
+        _ttsProvider.getTts().speak(value!);
+      });
+      return null;
+    }
+    if (recordText.contains('临时阅读')) {
+      Get.toNamed(CameraScreen.name);
+      return null;
+    }
+    if (recordText.contains('我的阅读')) {
+      Get.toNamed(BookListScreen.name);
+      return null;
+    }
+    if(recordText.contains('加载') && recordText.contains('评论')) {
+      return '加载评论';
+    }
+    if(recordText.contains('返回')) {
+      Get.back();
+    }
+    return recordText;
   }
 
-  void play() async {
+  /*void play() async {
     await _player.startPlayer(
         fromURI: _path, codec: Codec.pcm16, numChannels: 1, sampleRate: 16000);
-  }
+  }*/
 
   static const _ttsPath =
       '/sdcard/Android/data/com.example.seeworld_flutter/files/current.wav';

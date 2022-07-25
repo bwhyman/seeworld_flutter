@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/components/logger_utils.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
+import 'package:seeworld_flutter/provider/color_provider.dart';
 import 'package:seeworld_flutter/provider/dialog_provider.dart';
+import 'package:seeworld_flutter/provider/entity.dart';
+import 'package:seeworld_flutter/provider/floatingbutton_provider.dart';
 import 'package:seeworld_flutter/provider/tts_provider.dart';
 import 'package:seeworld_flutter/controller/book_controller.dart';
 import 'package:seeworld_flutter/provider/widget_provider.dart';
@@ -23,19 +27,52 @@ class _BookScreenState extends State<BookScreen> {
   final _addChapterController = TextEditingController();
   final DialogProvider _dialogProvider = Get.put(DialogProvider());
   final TextEditingController _editChapterController = TextEditingController();
+  final ColorProvider _colorProvider = Get.put(ColorProvider());
+  final FloatingButtonProvider _floatingButtonProvider =
+      Get.put(FloatingButtonProvider());
   late Book _book;
+  late RxList<Chapter> chapters = Get.put(BookController()).chapters;
+
+  _onRecord(String recordText) {
+    var c = chapters
+        .firstWhereOrNull((element) => recordText.contains(element.title!));
+    if (c != null) {
+      _route(c);
+    }
+  }
+
+  _route(Chapter c) {
+    Get.toNamed(ChapterScreen.name, arguments: c)!.then((value) {
+      Future.delayed(const Duration(seconds: 1), () => _speak());
+    });
+  }
+
+  _speak() {
+    String msg = '${_book.name}，共${chapters.length}章。';
+    if (chapters.isNotEmpty) {
+      msg = '$msg，章节主题包括：';
+      for (var c in chapters) {
+        msg = '$msg${c.title}，';
+      }
+    }
+    _ttsProvider.speakContent(msg);
+  }
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    _book = ModalRoute.of(context)!.settings.arguments as Book;
-    _bookController.listChaptersByBid(_book.id!);
-    var chapters = _bookController.chapters;
+    _book = Get.arguments as Book;
+    _bookController.listChaptersByBid(_book.id!).then((value) => _speak());
     return Scaffold(
-      appBar: _widgetProvider.getTitleAppbar(_book.name ?? '', items: [
+      resizeToAvoidBottomInset: false,
+      appBar: _widgetProvider.getTitleAppbar(_book.name!, items: [
         _widgetProvider.getIconButton(Icons.add, onPressed: _addChapter),
         _widgetProvider.getIconButton(Icons.cast_connected),
       ]),
+      floatingActionButton: _floatingButtonProvider.getFloatingRecordButton(
+          onRecorded: _onRecord),
+      floatingActionButtonLocation:
+          _floatingButtonProvider.getFloatingActionButtonLocation(),
       body: Obx(() => ListView.separated(
           itemBuilder: (context, index) {
             late Offset _downOffset;
@@ -74,10 +111,13 @@ class _BookScreenState extends State<BookScreen> {
                 );
               },
               child: ListTile(
+                leading: Icon(Icons.bubble_chart_outlined,
+                    size: UI.iconleadingSize,
+                    color: _colorProvider.getIconColor()),
                 title: Text(chapters[index].title!,
-                    style: const TextStyle(fontSize: 22)),
+                    style: const TextStyle(fontSize: UI.functionFontSize)),
                 onTap: () {
-                  Get.toNamed(ChapterScreen.name, arguments: chapters[index]);
+                  _route(chapters[index]);
                 },
               ),
             );
@@ -86,8 +126,9 @@ class _BookScreenState extends State<BookScreen> {
           itemCount: chapters.length)),
     );
   }
+
   _addChapter() {
-    _dialogProvider.addDialog(_addChapterController, '添加章节', '章节名称', () {
+    _dialogProvider.addDialog(_addChapterController, '添加章节', '章节名称', () async {
       var name = _addChapterController.value.text.trim();
       if (name.isNotEmpty) {
         Chapter c = Chapter(
@@ -95,16 +136,18 @@ class _BookScreenState extends State<BookScreen> {
             title: name,
             content: '',
             inserttime: DateTime.now().toString());
-        _bookController.insertChapter(c);
+        await _bookController.insertChapter(c);
       }
       Get.back();
+      _speak();
     });
   }
 
   _deleteChapter(Chapter chapter) {
-    _dialogProvider.deleteDialog('确定删除章节', chapter.title!, () {
-      _bookController.deleteChapter(chapter);
+    _dialogProvider.deleteDialog('确定删除章节', chapter.title!, () async {
+      await _bookController.deleteChapter(chapter);
       Get.back();
+      _speak();
     });
   }
 
@@ -116,6 +159,7 @@ class _BookScreenState extends State<BookScreen> {
         _bookController.updateChapter(chapter);
       }
       Get.back();
+      _speak();
     });
   }
 

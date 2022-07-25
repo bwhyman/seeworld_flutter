@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
+import 'package:seeworld_flutter/provider/color_provider.dart';
 import 'package:seeworld_flutter/screens/Favorites/favorites_screen.dart';
 import 'package:seeworld_flutter/screens/settings/login_screen.dart';
 import 'package:seeworld_flutter/screens/settings/settings_screens.dart';
 
 class Settings extends StatelessWidget {
-  const Settings({Key? key}) : super(key: key);
-
+  Settings({Key? key}) : super(key: key);
+  final ColorProvider _colorProvider = Get.put(ColorProvider());
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Column(
+    return Obx(() => Column(
       children: [
         Column(
           children:  [
@@ -18,27 +20,25 @@ class Settings extends StatelessWidget {
               onTap: () {
                 Get.toNamed(LoginScreen.name);
               },
-              child: const Icon(
+              child: Icon(
                 Icons.person_pin,
                 size: 250,
-                color: Colors.indigo,
+                color: _colorProvider.getIconColor(),
               ),
             ),
-            const Text(
-              '未登录',
-              style: TextStyle(color: Colors.indigo),
-            )
+             const Text('未登录',)
           ],
         ),
         const Divider(),
         ListTile(
           title: const Text(
             '收藏',
-            style: TextStyle(fontSize: 22),
+            style: TextStyle(fontSize: UI.functionFontSize),
           ),
-          leading: const Icon(
+          leading: Icon(
             Icons.favorite_outline,
-            color: Colors.blue,
+            size: UI.iconleadingSize,
+            color: _colorProvider.getIconColor(),
           )
           ,
           trailing: const Icon(
@@ -52,13 +52,13 @@ class Settings extends StatelessWidget {
         ListTile(
           title: const Text(
             '设置',
-            style: TextStyle(fontSize: 22),
+            style: TextStyle(fontSize: UI.functionFontSize),
           ),
-          leading: const Icon(
+          leading:  Icon(
             Icons.settings_outlined,
-            color: Colors.blue,
-          )
-          ,
+            size: UI.iconleadingSize,
+            color: _colorProvider.getIconColor(),
+          ),
           trailing: const Icon(
             Icons.chevron_right,
           ),
@@ -67,6 +67,6 @@ class Settings extends StatelessWidget {
           },
         )
       ],
-    );
+    ));
   }
 }

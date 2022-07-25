@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
 import 'package:seeworld_flutter/controller/common_controller.dart';
+import 'package:seeworld_flutter/provider/color_provider.dart';
 
 class ChannelList extends StatelessWidget {
   ChannelList({Key? key}) : super(key: key);
@@ -29,13 +31,14 @@ class _ChannelItemWidget extends StatelessWidget {
   _ChannelItemWidget(this.item);
 
   final CommonController _commonController = Get.put(CommonController());
-
+  final ColorProvider _colorProvider = Get.put(ColorProvider());
   @override
   Widget build(BuildContext context) {
+    var isRGBlinding = _colorProvider.isRGBlinding;
     var cItem = _commonController.currentItem;
     return GestureDetector(
       onTap: () {
-        if (cItem.value.index == item.index) {
+        if (cItem.value.title == item.title) {
           return;
         }
         cItem.value = item;
@@ -47,10 +50,8 @@ class _ChannelItemWidget extends StatelessWidget {
               item.title,
               style: TextStyle(
                   fontSize: 20,
-                  color: cItem.value.index == item.index
-                      ? Colors.red
-                      : Colors.blue,
-                  decoration: cItem.value.index == item.index
+                  color: _colorProvider.getFontColor(cItem.value.title == item.title),
+                  decoration: cItem.value.title == item.title
                       ? TextDecoration.underline
                       : null),
             )),

@@ -1,12 +1,13 @@
 import 'package:get/get.dart';
 import 'package:seeworld_flutter/components/baseurl_utils.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
+import 'package:seeworld_flutter/provider/entity.dart';
 
 class ChannelItem {
   String title;
-  int index;
 
-  ChannelItem(this.title, this.index);
+
+  ChannelItem(this.title);
 }
 
 class _ChannelProvider extends GetConnect {
@@ -20,17 +21,23 @@ class _ChannelProvider extends GetConnect {
 
 class CommonController extends GetxController {
   final _ChannelProvider _channelProvider = Get.put(_ChannelProvider());
-  var currentItem = ChannelItem('时政', 0).obs;
+  var currentItem = ChannelItem('时政').obs;
   var commonNews = <News>[].obs;
 
-  List<ChannelItem> channelItems = List.generate(
-      _titles.length, (index) => ChannelItem(_titles.elementAt(index), index));
+  List<ChannelItem> channelItems = _get();
 
-  Future<bool> listNews(String type) async {
+  Future<RxList<News>> listNews(String type) async {
     var l = await _channelProvider.loadTypeNews(type);
     commonNews.clear();
     commonNews.addAll(l);
-    return true;
+    return commonNews;
+  }
+  Set<String> getChannelBar() {
+    return _titles;
+  }
+  static List<ChannelItem> _get() {
+    return List.generate(
+        _titles.length, (index) => ChannelItem(_titles.elementAt(index)));
   }
 }
 

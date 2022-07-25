@@ -35,7 +35,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isTemp = ModalRoute.of(context)!.settings.arguments as bool;
+    bool isTemp = Get.arguments as bool;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,

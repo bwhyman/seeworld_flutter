@@ -3,9 +3,16 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seeworld_flutter/constants/Theme.dart';
+import 'package:seeworld_flutter/controller/book_controller.dart';
+import 'package:seeworld_flutter/controller/common_controller.dart';
+import 'package:seeworld_flutter/provider/color_provider.dart';
+import 'package:seeworld_flutter/provider/floatingbutton_provider.dart';
+import 'package:seeworld_flutter/provider/record_provider.dart';
 import 'package:seeworld_flutter/provider/sound_provider.dart';
 import 'package:seeworld_flutter/provider/tts_provider.dart';
 import 'package:seeworld_flutter/controller/recommend_controller.dart';
+import 'package:seeworld_flutter/screens/common/newscomment_screen.dart';
 import 'package:seeworld_flutter/screens/reading/myreading_screen.dart';
 import 'package:seeworld_flutter/screens/settings/my_screen.dart';
 import 'package:seeworld_flutter/provider/widget_provider.dart';
@@ -23,14 +30,19 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final FloatingButtonProvider _floatingButtonProvider =
+      Get.put(FloatingButtonProvider());
   final SoundProvider _soundUtils = Get.put(SoundProvider());
   final DialogProvider _dialogUtils = Get.put(DialogProvider());
   final RecommendController _recommendController =
       Get.put(RecommendController());
+  final CommonController _commonController = Get.put(CommonController());
   final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
   final PageController _myPage = PageController(initialPage: 0);
-  int _currentIndex = 0;
+  final ColorProvider _colorProvider = Get.put(ColorProvider());
+  final BookController _bookController = Get.put(BookController());
+  final _currentIndex = 0.obs;
 
   _change(int index) {
     if (index != 0) {
@@ -38,9 +50,8 @@ class _HomeState extends State<Home> {
     } else {
       _ttsProvider.speakProceed();
     }
-    _currentIndex = index;
+    _currentIndex.value = index;
     _myPage.jumpToPage(index);
-    setState(() {});
   }
 
   late StreamSubscription<ConnectivityResult> _subscription;
@@ -56,6 +67,7 @@ class _HomeState extends State<Home> {
       }
     });
     _recommendController.setTimer();
+    _bookController.initBook();
   }
 
   _checkConnection() async {
@@ -75,49 +87,35 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    var position = Get.arguments;
+    position = position ?? 0;
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+      _change(position as int);
+    });
+    //isRGBlinding = _colorProvider.isRGBlinding;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: _widgetProvider.getHomeAppbar(),
       resizeToAvoidBottomInset: false,
-      floatingActionButton: SizedBox(
-        width: 95,
-        height: 95,
-        child: FloatingActionButton(
-            onPressed: () {},
-            backgroundColor: Colors.indigoAccent,
-            child: GestureDetector(
-              onTapDown: (detail) {
-                _soundUtils.record();
-                _ttsProvider.getTts().stop();
-              },
-              onTapUp: (detail) {
-                _soundUtils.stop();
-              },
-              child: const Icon(
-                Icons.mic,
-                color: Colors.white,
-                size: 50,
-              ),
-            )),
-      ),
+      floatingActionButton: _floatingButtonProvider.getFloatingRecordButton(
+          onRecorded: _onRecordHome),
       floatingActionButtonLocation:
-      const _CustomFloatingActionButtonLocation(
-          FloatingActionButtonLocation.centerDocked, 0, -10),
+          _floatingButtonProvider.getFloatingActionButtonLocation(),
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12,
         color: Colors.white,
         shape: const CircularNotchedRectangle(),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          mainAxisSize: MainAxisSize.max,
-          children: <Widget>[
-            _initIconButtons()[0],
-            _initIconButtons()[1],
-            const SizedBox(width: 50),
-            _initIconButtons()[2],
-            _initIconButtons()[3],
-          ],
-        ),
+        child: Obx(() => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                _initIconButtons()[0],
+                _initIconButtons()[1],
+                const SizedBox(width: 50),
+                _initIconButtons()[2],
+                _initIconButtons()[3],
+              ],
+            )),
       ),
       body: SafeArea(
         child: PageView(
@@ -150,34 +148,40 @@ class _HomeState extends State<Home> {
       icons.add(IconButton(
         padding: const EdgeInsets.only(top: 20, bottom: 30),
         icon: Icon(icon,
-            color: _currentIndex == i ? Colors.red : Colors.blue, size: 35),
+            color: _currentIndex.value == i
+                ? (_colorProvider.isRGBlinding.value ? UI.iconIsRGBlinding : Colors.red)
+                : (_colorProvider.isRGBlinding.value ? UI.black : UI.iconColor),
+            size: 35),
         onPressed: () => _change(i),
       ));
     }
     return icons;
   }
 
-  _list() {
+  List<Widget> _list() {
     return [
       const RecommendContainer(),
       const CommonScreen(),
-      const MyReadingScreen(),
-      const Settings()
+      MyReadingScreen(),
+      Settings()
     ];
   }
-}
 
-class _CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
-  final FloatingActionButtonLocation location;
-  final double offsetX;
-  final double offsetY;
-
-  const _CustomFloatingActionButtonLocation(
-      this.location, this.offsetX, this.offsetY);
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    Offset offset = location.getOffset(scaffoldGeometry);
-    return Offset(offset.dx + offsetX, offset.dy + offsetY);
+  _onRecordHome(String recordText) {
+    if (recordText.contains('加载') && recordText.contains('新闻')) {
+      String channelTitle = _commonController
+          .getChannelBar()
+          .firstWhere((element) => recordText.contains(element));
+      if (channelTitle.isEmpty) {
+        _ttsProvider.getTts().speak('对不起，没有相应新闻类型，请重新尝试');
+      }
+      _commonController.currentItem.value = _commonController.channelItems
+          .firstWhere((element) => channelTitle == element.title);
+      _commonController.listNews(channelTitle);
+    }
+    if (recordText.contains('评论')) {
+      Get.toNamed(NewsCommentScreen.name,
+          arguments: _recommendController.currentNews.value);
+    }
   }
 }

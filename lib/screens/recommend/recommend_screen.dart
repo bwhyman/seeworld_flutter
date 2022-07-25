@@ -22,7 +22,6 @@ class _RecommendContainerState extends State<RecommendContainer>
   final ScrollController _controller = ScrollController();
   int _firstIndex = 0;
   int _lastIndex = 0;
-
   @override
   void initState() {
     super.initState();
@@ -35,6 +34,7 @@ class _RecommendContainerState extends State<RecommendContainer>
         () => _recommendController.listNews().then((value) {
           _ttsProvider.speakRecommendNews(
                   _recommendController.recommendNews[0]);
+          _recommendController.currentNews.value = _recommendController.recommendNews[0];
             }));
   }
 
@@ -59,7 +59,7 @@ class _RecommendContainerState extends State<RecommendContainer>
   Widget build(BuildContext context) {
     super.build(context);
     double height = MediaQuery.of(context).size.height;
-    _containerH = height - 24 - 95;
+    _containerH = height - 24 - 90;
     var recommendNews = _recommendController.recommendNews;
 
     return Listener(
@@ -133,6 +133,7 @@ class _RecommendContainerState extends State<RecommendContainer>
                 curve: Curves.easeInOutCubic)
             .then((value) {
           if (speak) {
+            _recommendController.currentNews.value = recommendNews[index];
             // tts读取
             _ttsProvider.speakRecommendNews(
                 recommendNews[index]);

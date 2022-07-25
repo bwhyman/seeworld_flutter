@@ -39,7 +39,7 @@ class Onboarding extends StatelessWidget {
                             fit: BoxFit.contain,
                             child: Text("SeeWorld",
                                 style: TextStyle(
-                                    color: NowUIColors.white,
+                                    color: UI.white,
                                     fontWeight: FontWeight.w600)))),
                   ],
                 ),
@@ -51,7 +51,7 @@ class Onboarding extends StatelessWidget {
                       children: [
                         const Text("Designed By",
                             style: TextStyle(
-                                color: NowUIColors.white,
+                                color: UI.white,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.3)),
                         const SizedBox(width: 5.0),
@@ -68,7 +68,7 @@ class Onboarding extends StatelessWidget {
                     child: TextButton(
                       style: ButtonStyle(
                           backgroundColor:
-                              MaterialStateProperty.all(NowUIColors.info),
+                              MaterialStateProperty.all(UI.info),
                           shape:
                               MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4.0),
@@ -81,7 +81,7 @@ class Onboarding extends StatelessWidget {
                               left: 16.0, right: 16.0, top: 16, bottom: 16),
                           child: Text("GET STARTED",
                               style: TextStyle(
-                                  fontSize: 22.0, color: NowUIColors.white))),
+                                  fontSize: 22.0, color: UI.white))),
                     ),
                   ),
                 )

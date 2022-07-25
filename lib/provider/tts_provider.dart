@@ -1,7 +1,7 @@
 
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
-import 'package:seeworld_flutter/controller/recommend_controller.dart';
+import 'package:seeworld_flutter/provider/entity.dart';
 
 class TtsProvider extends GetxController {
   static final FlutterTts _tts = _create();
@@ -29,13 +29,8 @@ class TtsProvider extends GetxController {
     _tts.speak(n);
   }
 
-  void resume() {
-    //_tts.speak(_currentNews.substring(_start, _end));
-  }
-
-
-  void speakContent(String content) {
-    _tts.speak(content);
+  Future speakContent(String content) async {
+    return _tts.speak(content);
   }
 
   void speakProceed() async {
