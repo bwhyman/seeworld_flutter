@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:seeworld_flutter/constants/Theme.dart';
 import 'package:seeworld_flutter/provider/color_provider.dart';
+import 'package:seeworld_flutter/provider/widget_provider.dart';
 import 'package:seeworld_flutter/screens/reading/booklist_screen.dart';
 import 'package:seeworld_flutter/screens/reading/camera_screen.dart';
 
@@ -11,6 +12,7 @@ class MyReadingScreen extends StatelessWidget {
 
   MyReadingScreen({Key? key}) : super(key: key);
   final ColorProvider _colorProvider = Get.put(ColorProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
 
   @override
   Widget build(BuildContext context) {
@@ -19,50 +21,25 @@ class MyReadingScreen extends StatelessWidget {
             const SizedBox(
               height: 30,
             ),
-            ListTile(
-              title: const Text(
+            _widgetProvider.getListTile(
+                Icons.menu_book_outlined,
                 '我的阅读',
-                style: TextStyle(fontSize: UI.functionFontSize),
-              ),
-              //subtitle: const Text('共2本'),
-              leading: Icon(Icons.menu_book_outlined,
-                  size: UI.iconleadingSize,
-                  color: _colorProvider.getIconColor()),
-              trailing: const Icon(
-                Icons.chevron_right,
-              ),
-              onTap: () {
-                Get.toNamed(BookListScreen.name);
-              },
-            ),
-            ListTile(
-              title: const Text(
+            onTaped: () {
+              Get.toNamed(BookListScreen.name);
+            }),
+            _widgetProvider.getListTile(
+                Icons.monetization_on_outlined,
                 '在线书店',
-                style: TextStyle(fontSize: UI.functionFontSize),
-              ),
-              leading: Icon(Icons.monetization_on_outlined,
-                  size: UI.iconleadingSize,
-                  color: _colorProvider.getIconColor()),
-              trailing: const Icon(
-                Icons.chevron_right,
-              ),
-              onTap: () {},
-            ),
+            onTaped: () {}),
             const SizedBox(
               height: 80,
             ),
-            ListTile(
-              title: const Text(
+            _widgetProvider.getListTile(
+                Icons.camera_outlined,
                 '临时阅读',
-                style: TextStyle(fontSize: UI.functionFontSize),
-              ),
-              leading: Icon(Icons.camera_outlined,
-                  size: UI.iconleadingSize,
-                  color: _colorProvider.getIconColor()),
-              onTap: () {
-                Get.toNamed(CameraScreen.name, arguments: true);
-              },
-            ),
+                onTaped: () {
+                  Get.toNamed(CameraScreen.name, arguments: true);
+                })
           ],
         ));
   }

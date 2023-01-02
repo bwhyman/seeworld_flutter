@@ -70,8 +70,9 @@ class _BookListScreenState extends State<BookListScreen> {
   }
 
   _onRecord(String recordText) {
-    var b = books.firstWhereOrNull((element) => recordText.contains(element.name!));
-    if(b != null) {
+    var b =
+        books.firstWhereOrNull((element) => recordText.contains(element.name!));
+    if (b != null) {
       Get.toNamed(BookScreen.name, arguments: b)?.then((value) {
         Future.delayed(const Duration(seconds: 1), () => _speak());
       });
@@ -107,7 +108,7 @@ class _BoolListState extends State<_BookList> {
   final TextEditingController _editBookController = TextEditingController();
   final BookController _bookController = Get.put(BookController());
   final DialogProvider _dialogProvider = Get.put(DialogProvider());
-  final WidgetProvider _appBarProvider = Get.put(WidgetProvider());
+  final WidgetProvider _widgetProvider = Get.put(WidgetProvider());
   final ColorProvider _colorProvider = Get.put(ColorProvider());
   final TtsProvider _ttsProvider = Get.put(TtsProvider());
   final RxList<Book> _books = Get.put(BookController()).books;
@@ -144,7 +145,7 @@ class _BoolListState extends State<_BookList> {
                   renderBox.size.height - _downOffset.dy,
                 ),
                 items: <PopupMenuEntry>[
-                  _appBarProvider.getPopupMenuItem(Icons.edit_outlined, '编辑',
+                  _widgetProvider.getPopupMenuItem(Icons.edit_outlined, '编辑',
                       onTaped: () {
                     Future.delayed(const Duration(), () {
                       _editBookController.value = _editBookController.value
@@ -152,7 +153,7 @@ class _BoolListState extends State<_BookList> {
                       _editBookName(_books[index]);
                     });
                   }),
-                  _appBarProvider.getPopupMenuItem(Icons.delete_outline, '删除',
+                  _widgetProvider.getPopupMenuItem(Icons.delete_outline, '删除',
                       onTaped: () {
                     Future.delayed(const Duration(), () {
                       _deleteBook(_books[index]);
@@ -161,26 +162,14 @@ class _BoolListState extends State<_BookList> {
                 ],
               );
             },
-            child: ListTile(
-              title: Text(
-                '${_books[index].name}',
-                style: const TextStyle(fontSize: UI.functionFontSize),
-              ),
-              leading: Icon(
-                Icons.bookmark_border_outlined,
-                size: UI.iconleadingSize,
-                color: _colorProvider.getIconColor(),
-              ),
-              trailing: const Icon(
-                Icons.chevron_right,
-              ),
-              onTap: () {
-                Get.toNamed(BookScreen.name, arguments: _books[index])
-                    ?.then((value) {
-                  Future.delayed(const Duration(seconds: 1), () => _speak());
-                });
-              },
-            ),
+            child: _widgetProvider.getListTile(
+                Icons.bookmark_border_outlined, '${_books[index].name}',
+                onTaped: () {
+              Get.toNamed(BookScreen.name, arguments: _books[index])
+                  ?.then((value) {
+                Future.delayed(const Duration(seconds: 1), () => _speak());
+              });
+            }),
           );
         }));
   }

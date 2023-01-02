@@ -110,16 +110,11 @@ class _BookScreenState extends State<BookScreen> {
                   ],
                 );
               },
-              child: ListTile(
-                leading: Icon(Icons.bubble_chart_outlined,
-                    size: UI.iconleadingSize,
-                    color: _colorProvider.getIconColor()),
-                title: Text(chapters[index].title!,
-                    style: const TextStyle(fontSize: UI.functionFontSize)),
-                onTap: () {
-                  _route(chapters[index]);
-                },
-              ),
+              child: _widgetProvider.getListTile(
+                  Icons.bubble_chart_outlined, chapters[index].title!,
+                  onTaped: () {
+                _route(chapters[index]);
+              }),
             );
           },
           separatorBuilder: (c, _) => const Divider(),

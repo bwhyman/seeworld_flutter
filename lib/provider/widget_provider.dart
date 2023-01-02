@@ -97,4 +97,24 @@ class WidgetProvider extends GetxController {
       size: 32,
     );
   }
+
+  ListTile getListTile(IconData iconData, String text, {Widget? subtitle , Function()? onTaped}) {
+    return ListTile(
+      title: Text(
+        text,
+        style: const TextStyle(fontSize: UI.functionFontSize),
+      ),
+      leading: Icon(
+        iconData,
+        size: UI.iconleadingSize,
+        color: _colorProvider.getIconColor(),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right,
+      ),
+      onTap: onTaped,
+      subtitle: subtitle,
+    );
+
+  }
 }
